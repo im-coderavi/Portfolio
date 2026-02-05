@@ -4,6 +4,7 @@ import { ExternalLink, Github, Loader2 } from 'lucide-react';
 import Card from '../common/Card';
 import FadeIn from '../animations/FadeIn';
 import axios from 'axios';
+import API_URL from '../../config/api';
 
 const Projects = () => {
     const [projects, setProjects] = useState([]);
@@ -13,7 +14,7 @@ const Projects = () => {
     useEffect(() => {
         const fetchProjects = async () => {
             try {
-                const response = await axios.get('http://localhost:5000/api/projects');
+                const response = await axios.get(`${API_URL}/api/projects`);
                 if (response.data.success) {
                     setProjects(response.data.projects);
                 }
@@ -67,7 +68,7 @@ const Projects = () => {
                                         {/* Project Image */}
                                         <div className="relative h-64 overflow-hidden bg-gradient-to-br from-primary-light to-primary-dark">
                                             <img
-                                                src={project.image?.startsWith('http') ? project.image : `http://localhost:5000${project.image}`}
+                                                src={project.image?.startsWith('http') ? project.image : `${API_URL}${project.image}`}
                                                 alt={project.title}
                                                 className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                                                 onError={(e) => {

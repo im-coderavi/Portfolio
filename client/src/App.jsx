@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import { Routes, Route, useLocation } from 'react-router-dom';
 import { HelmetProvider } from 'react-helmet-async';
+import API_URL from './config/api';
 import Navbar from './components/common/Navbar';
 import Footer from './components/common/Footer';
 import ScrollProgress from './components/common/ScrollProgress';
@@ -42,7 +43,7 @@ function App() {
     if (!isAdminRoute) {
       const trackVisitor = async () => {
         try {
-          await fetch('http://localhost:5000/api/visitor', {
+          await fetch(`${API_URL}/api/visitor`, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',

@@ -4,6 +4,7 @@ import axios from 'axios';
 import Button from '../components/common/Button';
 import { Lock, AlertCircle } from 'lucide-react';
 import FadeIn from '../components/animations/FadeIn';
+import API_URL from '../config/api';
 
 const AdminLogin = () => {
     const [password, setPassword] = useState('');
@@ -17,7 +18,7 @@ const AdminLogin = () => {
         setError('');
 
         try {
-            const response = await axios.post('http://localhost:5000/api/admin/login', { password });
+            const response = await axios.post(`${API_URL}/api/admin/login`, { password });
 
             if (response.data.success) {
                 localStorage.setItem('adminToken', response.data.token);

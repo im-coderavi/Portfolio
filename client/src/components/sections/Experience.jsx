@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { Briefcase, MapPin, Calendar } from 'lucide-react';
 import axios from 'axios';
 import FadeIn from '../animations/FadeIn';
+import API_URL from '../../config/api';
 
 const Experience = () => {
     const [experiences, setExperiences] = useState([]);
@@ -11,7 +12,7 @@ const Experience = () => {
     useEffect(() => {
         const fetchExperiences = async () => {
             try {
-                const response = await axios.get('http://localhost:5000/api/experiences');
+                const response = await axios.get(`${API_URL}/api/experiences`);
                 if (response.data.success) {
                     setExperiences(response.data.experiences);
                 }

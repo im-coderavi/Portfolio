@@ -7,6 +7,7 @@ import { z } from 'zod';
 import Card from '../common/Card';
 import Button from '../common/Button';
 import FadeIn from '../animations/FadeIn';
+import API_URL from '../../config/api';
 
 const contactSchema = z.object({
     name: z.string().min(2, 'Name must be at least 2 characters'),
@@ -24,7 +25,7 @@ const Contact = () => {
     const onSubmit = async (data) => {
         try {
             // Send form data to backend API
-            const response = await fetch('http://localhost:5000/api/contact', {
+            const response = await fetch(`${API_URL}/api/contact`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
