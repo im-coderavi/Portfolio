@@ -102,8 +102,8 @@ PORTFOLIO/
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/avishekgiri/portfolio.git
-   cd portfolio
+   git clone https://github.com/im-coderavi/Portfolio.git
+   cd Portfolio
    ```
 
 2. **Setup Backend**
@@ -282,3 +282,4 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
   
   ⭐ Star this repo if you found it helpful!
 </div>
+
