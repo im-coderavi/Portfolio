@@ -1,0 +1,145 @@
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&family=Fira+Code:wght@400;500&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Base Styles */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+/* Dark Mode (Default) */
+body {
+  font-family: 'Inter', sans-serif;
+  background-color: #0A0E27;
+  color: #FFFFFF;
+  overflow-x: hidden;
+  line-height: 1.6;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Light Mode */
+html.light body {
+  background-color: #F5F7FA;
+  color: #1A1F3A;
+}
+
+/* Smooth scrolling */
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
+/* Selection - Dark Mode */
+::selection {
+  background: #00F5FF;
+  color: #0A0E27;
+}
+
+/* Selection - Light Mode */
+html.light ::selection {
+  background: #0066FF;
+  color: #FFFFFF;
+}
+
+/* Scrollbar - Dark Mode */
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: #060913;
+}
+
+html.light ::-webkit-scrollbar-track {
+  background: #E5E7EB;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #00F5FF;
+  border-radius: 5px;
+}
+
+html.light ::-webkit-scrollbar-thumb {
+  background: #0066FF;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #0066FF;
+}
+
+html.light ::-webkit-scrollbar-thumb:hover {
+  background: #00F5FF;
+}
+
+/* Glassmorphism Utilities - Dark Mode */
+.glass {
+  background: rgba(26, 31, 58, 0.7);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  transition: background 0.3s ease, border 0.3s ease;
+}
+
+/* Glassmorphism - Light Mode */
+html.light .glass {
+  background: rgba(255, 255, 255, 0.8);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+/* Text Gradient */
+.text-gradient {
+  background: linear-gradient(135deg, #00F5FF 0%, #0066FF 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Light Mode Text Colors */
+html.light .text-text-secondary {
+  color: #6B7280 !important;
+}
+
+html.light .text-white {
+  color: #1A1F3A !important;
+}
+
+/* Light Mode Backgrounds */
+html.light .bg-primary-dark {
+  background-color: #F5F7FA !important;
+}
+
+html.light .bg-primary-darker {
+  background-color: #E8EBF0 !important;
+}
+
+html.light .bg-primary-light {
+  background-color: #FFFFFF !important;
+}
+
+/* Light Mode Borders */
+html.light [class*="border-white"] {
+  border-color: rgba(0, 0, 0, 0.1) !important;
+}
+
+/* Light Mode Card Backgrounds */
+html.light .bg-white\/5 {
+  background-color: rgba(0, 0, 0, 0.03) !important;
+}
+
+html.light .bg-white\/10 {
+  background-color: rgba(0, 0, 0, 0.05) !important;
+}
+
+/* Light Mode Hover States */
+html.light .hover\:bg-white\/10:hover {
+  background-color: rgba(0, 0, 0, 0.08) !important;
+}
