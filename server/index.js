@@ -81,6 +81,13 @@ app.use(cors(corsOptions));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
+// Serve uploaded files (for backward compatibility with local images)
+// This allows existing images to load locally while we migrate them
+const uploadDir = path.join(__dirname, 'uploads');
+if (fs.existsSync(uploadDir)) {
+    app.use('/uploads', express.static(uploadDir));
+}
+
 // MongoDB Connection with caching for serverless
 let cachedDb = null;
 
