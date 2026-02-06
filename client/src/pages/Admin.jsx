@@ -20,7 +20,7 @@ const Admin = () => {
 
     const fetchProjects = async () => {
         try {
-            const response = await axios.get('/api/projects');
+            const response = await axios.get(`${API_URL}/api/projects`);
             if (response.data.success) {
                 setProjects(response.data.projects);
             }
@@ -34,7 +34,7 @@ const Admin = () => {
     const fetchSettings = async () => {
         try {
             const token = localStorage.getItem('adminToken');
-            const response = await axios.get('/api/admin/settings', {
+            const response = await axios.get(`${API_URL}/api/admin/settings`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             if (response.data.success) {
@@ -52,7 +52,7 @@ const Admin = () => {
             // Optimistic update
             setNotificationsEnabled(newState);
 
-            await axios.post('/api/admin/settings', {
+            await axios.post(`${API_URL}/api/admin/settings`, {
                 notificationsEnabled: newState
             }, {
                 headers: { Authorization: `Bearer ${token}` }
@@ -82,7 +82,7 @@ const Admin = () => {
     const handleCreate = async (projectData) => {
         try {
             const token = localStorage.getItem('adminToken');
-            await axios.post('/api/admin/projects', projectData, {
+            await axios.post(`${API_URL}/api/admin/projects`, projectData, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             fetchProjects();
@@ -96,7 +96,7 @@ const Admin = () => {
         try {
             const token = localStorage.getItem('adminToken');
             await axios.put(
-                `/api/admin/projects/${editingProject._id}`,
+                `${API_URL}/api/admin/projects/${editingProject._id}`,
                 projectData,
                 { headers: { Authorization: `Bearer ${token}` } }
             );
@@ -112,7 +112,7 @@ const Admin = () => {
 
         try {
             const token = localStorage.getItem('adminToken');
-            await axios.delete(`/api/admin/projects/${id}`, {
+            await axios.delete(`${API_URL}/api/admin/projects/${id}`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             fetchProjects();

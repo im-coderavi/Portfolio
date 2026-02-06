@@ -24,7 +24,7 @@ const ExperienceManager = () => {
 
     const fetchExperiences = async () => {
         try {
-            const response = await axios.get('/api/experiences');
+            const response = await axios.get(`${API_URL}/api/experiences`);
             if (response.data.success) {
                 setExperiences(response.data.experiences);
             }
@@ -58,13 +58,13 @@ const ExperienceManager = () => {
 
             if (editingExperience) {
                 await axios.put(
-                    `/api/admin/experiences/${editingExperience._id}`,
+                    `${API_URL}/api/admin/experiences/${editingExperience._id}`,
                     dataToSend,
                     { headers: { Authorization: `Bearer ${token}` } }
                 );
             } else {
                 await axios.post(
-                    '/api/admin/experiences',
+                    `${API_URL}/api/admin/experiences`,
                     dataToSend,
                     { headers: { Authorization: `Bearer ${token}` } }
                 );
@@ -97,7 +97,7 @@ const ExperienceManager = () => {
 
         try {
             const token = localStorage.getItem('adminToken');
-            await axios.delete(`/api/admin/experiences/${id}`, {
+            await axios.delete(`${API_URL}/api/admin/experiences/${id}`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             fetchExperiences();
