@@ -348,6 +348,7 @@ app.post('/api/admin/settings', verifyToken, async (req, res) => {
 // Get all projects (public)
 app.get('/api/projects', async (req, res) => {
     try {
+        await connectToDatabase(); // Ensure connection
         const projects = await Project.find().sort({ order: 1, createdAt: -1 });
         res.status(200).json({
             success: true,
@@ -477,6 +478,7 @@ app.delete('/api/admin/projects/:id', verifyToken, async (req, res) => {
 // Get all experiences (public)
 app.get('/api/experiences', async (req, res) => {
     try {
+        await connectToDatabase(); // Ensure connection
         const experiences = await Experience.find().sort({ order: 1, startDate: -1 });
         res.status(200).json({
             success: true,
