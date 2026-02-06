@@ -67,31 +67,31 @@ The current issue is that Vercel is using an old commit. We'll force a new deplo
 
 ### Step 2: Deploy Frontend
 
-1. **Go to Vercel Dashboard**
+**CRITICAL: You MUST deploy the Backend FIRST.**
+
+1. **Get your Backend URL**
+   - After deploying the backend (Part 1), copy its URL (e.g., `https://portfolio-backend-xyz.vercel.app`).
+   - **Important:** If your new backend URL is different from what is currently in `client/vercel.json`, you MUST update that file in your code and push to GitHub BEFORE deploying the frontend.
+
+2. **Update `client/vercel.json`**
+   - Open `client/vercel.json`.
+   - Ensure the "destination" field points to your **new** backend URL.
+   ```json
+   "destination": "https://YOUR-NEW-BACKEND-URL.vercel.app/api/$1"
+   ```
+   - Commit and push this change to GitHub.
+
+3. **Go to Vercel Dashboard**
    - Click "Add New" → "Project"
+   - Import `im-coderavi/Portfolio`
 
-2. **Import Repository (Again)**
-   - Select `im-coderavi/Portfolio`
-   - Click "Import"
-
-3. **Configure Frontend Project**
-   - **Project Name**: `portfolio-frontend` (or your preferred name)
-   - **Framework Preset**: Vite
+4. **Configure Frontend Project**
    - **Root Directory**: `client`
-   - **Build Command**: `npm run build`
-   - **Output Directory**: `dist`
-   - **Install Command**: `npm install --legacy-peer-deps`
-
-4. **Environment Variables**:
-   ```
-   VITE_API_URL=https://portfolio-backend-xyz.vercel.app
-   ```
-   (Use your backend URL from Part 1)
+   - **Framework Preset**: Vite
+   - **Environment Variables**: None needed! (We are using internal proxy now).
 
 5. **Deploy**
-   - Click "Deploy"
-   - Wait 2-3 minutes
-   - You'll get URL: `https://portfolio-xyz.vercel.app`
+
 
 ---
 
