@@ -119,7 +119,7 @@ async function connectToDatabase() {
         mongoose.set('bufferTimeoutMS', 30000);
         console.log('✅ Connected to MongoDB Atlas');
         cachedDb = mongoose.connection;
-        await initializeSettings();
+        // Note: Settings will be initialized on first admin access
         return cachedDb;
     } catch (err) {
         console.error('❌ MongoDB connection error:', err);
