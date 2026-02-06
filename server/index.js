@@ -74,6 +74,8 @@ const corsOptions = {
             'http://localhost:5173',
             'http://localhost:3000',
             'http://localhost:4173', // Vite Preview
+            'https://www.coderavi.in',
+            'https://coderavi.in',
             /\.vercel\.app$/  // Allow all Vercel deployments
         ];
 
