@@ -108,9 +108,13 @@ async function connectToDatabase() {
 
     try {
         await mongoose.connect(process.env.MONGODB_URI, {
-            serverSelectionTimeoutMS: 5000,
+            serverSelectionTimeoutMS: 30000, // 30 seconds for serverless cold start
             socketTimeoutMS: 45000,
+            bufferCommands: false, // Disable buffering
         });
+
+        // Set buffer timeout to prevent hanging operations
+        mongoose.set('bufferTimeoutMS', 30000);
         console.log('✅ Connected to MongoDB Atlas');
         cachedDb = mongoose.connection;
         await initializeSettings();
