@@ -13,6 +13,8 @@
 
 [View Live Demo](https://coderavi.in) · [Report Bug](https://github.com/im-coderavi/Portfolio/issues) · [Request Feature](https://github.com/im-coderavi/Portfolio/issues)
 
+![Portfolio Preview](./screenshots/hero-section.png)
+
 </div>
 
 ---
