@@ -28,7 +28,7 @@ export default {
                 }
             },
             fontFamily: {
-                display: ['Space Grotesk', 'sans-serif'],
+                display: ['Outfit', 'sans-serif'],
                 body: ['Inter', 'sans-serif'],
                 mono: ['Fira Code', 'monospace'],
             },

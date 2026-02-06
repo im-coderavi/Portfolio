@@ -106,7 +106,7 @@ const Hero = () => {
                     </FadeIn>
 
                     <FadeIn direction="up" delay={0.3}>
-                        <h1 className="text-4xl md:text-6xl lg:text-7xl font-display font-bold text-gradient leading-tight">
+                        <h1 className="text-4xl md:text-6xl lg:text-7xl font-display font-bold uppercase tracking-wider text-gradient leading-tight">
                             AVISHEK GIRI
                         </h1>
                     </FadeIn>
