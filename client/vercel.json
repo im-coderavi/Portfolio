@@ -2,7 +2,7 @@
     "rewrites": [
         {
             "source": "/api/(.*)",
-            "destination": "https://coderavi.in/api/$1"
+            "destination": "https://portfolioserver-seven.vercel.app/api/$1"
         },
         {
             "source": "/(.*)",

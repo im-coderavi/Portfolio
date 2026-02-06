@@ -64,35 +64,12 @@ const upload = multer({
 });
 
 // Middleware
+// Simplified CORS configuration to support Vercel rewrites
+// Vercel rewrites don't preserve the original Origin header properly,
+// so we need to allow all origins for the API to work correctly
 const corsOptions = {
-    origin: function (origin, callback) {
-        // Allow requests with no origin (like mobile apps or curl requests)
-        if (!origin) return callback(null, true);
-
-        // Allow localhost and Vercel deployments
-        const allowedOrigins = [
-            'http://localhost:5173',
-            'http://localhost:3000',
-            'http://localhost:4173', // Vite Preview
-            'https://www.coderavi.in',
-            'https://coderavi.in',
-            /\.vercel\.app$/  // Allow all Vercel deployments
-        ];
-
-        const isAllowed = allowedOrigins.some(allowed => {
-            if (allowed instanceof RegExp) {
-                return allowed.test(origin);
-            }
-            return allowed === origin;
-        });
-
-        if (isAllowed) {
-            callback(null, true);
-        } else {
-            callback(new Error('Not allowed by CORS'));
-        }
-    },
-    credentials: true,
+    origin: '*',  // Allow all origins (necessary for Vercel rewrites)
+    credentials: false,  // Disable credentials (JWT is sent in Authorization header)
     optionsSuccessStatus: 200
 };
 
