@@ -30,13 +30,15 @@ const initializeSettings = async () => {
     }
 };
 
-// Ensure uploads directory exists
+// Ensure uploads directory exists (only in development)
+// Serverless functions don't have persistent file system
 const uploadDir = path.join(__dirname, 'uploads');
-if (!fs.existsSync(uploadDir)) {
+if (process.env.NODE_ENV !== 'production' && !fs.existsSync(uploadDir)) {
     fs.mkdirSync(uploadDir, { recursive: true });
 }
 
-// Multer Configuration
+// Multer Configuration (for local development only)
+// For production, use external storage like Cloudinary or Vercel Blob
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
         cb(null, 'uploads/');
@@ -96,13 +98,31 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
-// MongoDB Connection
-mongoose.connect(process.env.MONGODB_URI)
-    .then(() => {
+// MongoDB Connection with caching for serverless
+let cachedDb = null;
+
+async function connectToDatabase() {
+    if (cachedDb && mongoose.connection.readyState === 1) {
+        return cachedDb;
+    }
+
+    try {
+        await mongoose.connect(process.env.MONGODB_URI, {
+            serverSelectionTimeoutMS: 5000,
+            socketTimeoutMS: 45000,
+        });
         console.log('✅ Connected to MongoDB Atlas');
-        initializeSettings();
-    })
-    .catch(err => console.error('❌ MongoDB connection error:', err));
+        cachedDb = mongoose.connection;
+        await initializeSettings();
+        return cachedDb;
+    } catch (err) {
+        console.error('❌ MongoDB connection error:', err);
+        throw err;
+    }
+}
+
+// Initialize connection
+connectToDatabase().catch(console.error);
 
 // Middleware to verify JWT token
 const verifyToken = (req, res, next) => {
