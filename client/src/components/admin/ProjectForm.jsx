@@ -26,7 +26,7 @@ const ProjectForm = ({ initialData, onSubmit, onCancel }) => {
             });
             // Handle existing image for preview
             if (initialData.image) {
-                setPreviewUrl(initialData.image.startsWith('http') ? initialData.image : `${initialData.image}`);
+                setPreviewUrl(initialData.image.startsWith('http') ? initialData.image : `${API_URL}${initialData.image}`);
             }
         }
     }, [initialData]);

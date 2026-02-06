@@ -228,7 +228,7 @@ const Admin = () => {
                                 >
                                     <div className="aspect-video relative overflow-hidden">
                                         <img
-                                            src={project.image?.startsWith('http') ? project.image : `${project.image}`}
+                                            src={project.image?.startsWith('http') ? project.image : `${API_URL}${project.image}`}
                                             alt={project.title}
                                             className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                                         />
