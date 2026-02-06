@@ -50,9 +50,9 @@ const Navbar = () => {
                     to="hero"
                     smooth={true}
                     duration={500}
-                    className="text-2xl font-display font-bold text-gradient cursor-pointer"
+                    className="text-2xl font-display font-bold logo-rgb-text cursor-pointer"
                 >
-                    AG
+                    Avishek Giri
                 </Link>
 
                 {/* Desktop Navigation */}

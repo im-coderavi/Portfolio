@@ -143,3 +143,37 @@ html.light .bg-white\/10 {
 html.light .hover\:bg-white\/10:hover {
   background-color: rgba(0, 0, 0, 0.08) !important;
 }
+
+/* RGB Text Animation */
+@keyframes rgb-flow {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.logo-rgb-text {
+  background: linear-gradient(
+    -45deg,
+    #ff0000,
+    #ff7f00,
+    #ffff00,
+    #00ff00,
+    #0000ff,
+    #4b0082,
+    #8f00ff
+  );
+  background-size: 300% 300%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: rgb-flow 5s ease infinite;
+  text-shadow: 0 0 20px rgba(255, 255, 255, 0.1);
+  font-weight: 800;
+  letter-spacing: -0.5px;
+}
