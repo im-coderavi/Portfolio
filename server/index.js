@@ -7,6 +7,8 @@ const mongoose = require('mongoose');
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
+const cloudinary = require('cloudinary').v2;
+const { CloudinaryStorage } = require('multer-storage-cloudinary');
 require('dotenv').config();
 
 // Import Models
@@ -16,6 +18,13 @@ const Experience = require('./models/Experience');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
+
+// Cloudinary Configuration
+cloudinary.config({
+    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+    api_key: process.env.CLOUDINARY_API_KEY,
+    api_secret: process.env.CLOUDINARY_API_SECRET
+});
 
 // Initialize Default Settings
 const initializeSettings = async () => {
@@ -30,37 +39,19 @@ const initializeSettings = async () => {
     }
 };
 
-// Ensure uploads directory exists (only in development)
-// Serverless functions don't have persistent file system
-const uploadDir = path.join(__dirname, 'uploads');
-if (process.env.NODE_ENV !== 'production' && !fs.existsSync(uploadDir)) {
-    fs.mkdirSync(uploadDir, { recursive: true });
-}
-
-// Multer Configuration (for local development only)
-// For production, use external storage like Cloudinary or Vercel Blob
-const storage = multer.diskStorage({
-    destination: (req, file, cb) => {
-        cb(null, 'uploads/');
-    },
-    filename: (req, file, cb) => {
-        cb(null, Date.now() + path.extname(file.originalname)); // Append extension
+// Cloudinary Storage Configuration
+const storage = new CloudinaryStorage({
+    cloudinary: cloudinary,
+    params: {
+        folder: 'portfolio-projects',
+        allowed_formats: ['jpg', 'jpeg', 'png', 'webp', 'gif'],
+        transformation: [{ width: 1200, height: 675, crop: 'limit' }]
     }
 });
 
 const upload = multer({
     storage: storage,
-    limits: { fileSize: 5 * 1024 * 1024 }, // 5MB limit
-    fileFilter: (req, file, cb) => {
-        const filetypes = /jpeg|jpg|png|webp|gif/;
-        const mimetype = filetypes.test(file.mimetype);
-        const extname = filetypes.test(path.extname(file.originalname).toLowerCase());
-
-        if (mimetype && extname) {
-            return cb(null, true);
-        }
-        cb(new Error('Error: Images Only!'));
-    }
+    limits: { fileSize: 5 * 1024 * 1024 } // 5MB limit
 });
 
 // Middleware
@@ -89,9 +80,6 @@ app.use((req, res, next) => {
 app.use(cors(corsOptions));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
-
-// Serve uploaded files
-app.use('/uploads', express.static(uploadDir));
 
 // MongoDB Connection with caching for serverless
 let cachedDb = null;
@@ -376,7 +364,7 @@ app.post('/api/admin/projects', verifyToken, upload.single('image'), async (req,
 
         let image = req.body.image;
         if (req.file) {
-            image = `/uploads/${req.file.filename}`;
+            image = req.file.path; // Cloudinary URL
         }
 
         if (!title || !description || ((!image || image === 'undefined') && !req.file)) {
@@ -420,7 +408,7 @@ app.put('/api/admin/projects/:id', verifyToken, upload.single('image'), async (r
         const updates = { ...req.body };
 
         if (req.file) {
-            updates.image = `/uploads/${req.file.filename}`;
+            updates.image = req.file.path; // Cloudinary URL
         }
 
         // If technologies comes as string from form-data, parse it
@@ -460,11 +448,17 @@ app.delete('/api/admin/projects/:id', verifyToken, async (req, res) => {
 
         const project = await Project.findByIdAndDelete(id);
 
-        // Optionally delete the image file from uploads if it's a local file
-        if (project && project.image && project.image.startsWith('/uploads/')) {
-            const imagePath = path.join(__dirname, project.image);
-            if (fs.existsSync(imagePath)) {
-                fs.unlinkSync(imagePath);
+        // Delete image from Cloudinary if it's a Cloudinary URL
+        if (project && project.image && project.image.includes('cloudinary.com')) {
+            try {
+                // Extract public_id from Cloudinary URL
+                const urlParts = project.image.split('/');
+                const filename = urlParts[urlParts.length - 1];
+                const publicId = `portfolio-projects/${filename.split('.')[0]}`;
+                await cloudinary.uploader.destroy(publicId);
+                console.log('✅ Deleted image from Cloudinary:', publicId);
+            } catch (error) {
+                console.error('❌ Failed to delete image from Cloudinary:', error);
             }
         }
 
