@@ -1,285 +1,197 @@
 # 🚀 Portfolio Website - Avishek Giri
 
-A modern, responsive full-stack portfolio website built with the MERN stack, featuring an admin panel for content management, AI integration capabilities, and stunning UI/UX design.
+<div align="center">
 
-![Portfolio Preview](./screenshots/hero-section.png)
+[![React](https://img.shields.io/badge/React-18.2.0-blue?style=for-the-badge&logo=react)](https://reactjs.org/)
+[![Node.js](https://img.shields.io/badge/Node.js-18.x-green?style=for-the-badge&logo=nodedotjs)](https://nodejs.org/)
+[![Express](https://img.shields.io/badge/Express-4.x-black?style=for-the-badge&logo=express)](https://expressjs.com/)
+[![MongoDB](https://img.shields.io/badge/MongoDB-Atlas-green?style=for-the-badge&logo=mongodb)](https://www.mongodb.com/)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind-3.0-blue?style=for-the-badge&logo=tailwindcss)](https://tailwindcss.com/)
+[![Vercel](https://img.shields.io/badge/Vercel-Deployed-black?style=for-the-badge&logo=vercel)](https://vercel.com/)
+
+**A modern, responsive MERN stack portfolio featuring a dynamic admin panel, cloud-based image management, and AI integration capabilities.**
+
+[View Live Demo](https://coderavi.in) · [Report Bug](https://github.com/im-coderavi/Portfolio/issues) · [Request Feature](https://github.com/im-coderavi/Portfolio/issues)
+
+</div>
+
+---
 
 ## ✨ Features
 
-### 🎨 Frontend
-- **Modern UI/UX** - Glassmorphism design with gradient effects
-- **Fully Responsive** - Optimized for all devices (mobile, tablet, desktop)
-- **Smooth Animations** - Framer Motion for fluid transitions
-- **Dark Theme** - Eye-friendly dark color scheme
+### 🎨 Frontend Experience
+- **Glassmorphism Design**: Stunning visual effects with smooth gradients and heavy blur.
+- **Fully Responsive**: Verified on all devices from 320px mobile to 4k monitors.
+- **Framer Motion Animations**: Fluid page transitions, scroll interactions, and gesture support.
 - **Interactive Sections**:
-  - Hero with animated introduction
-  - About Me with animated stats
-  - Skills showcase with technology cards
-  - Professional Experience timeline
-  - Projects gallery with filtering
-  - Education timeline
-  - FAQ accordion
-  - Contact form with email integration
+  - **Dynamic Hero**: Animated text and impressive first impression.
+  - **Experience Timeline**: Visual representation of professional journey.
+  - **Projects Gallery**: Filterable grid with cloud-hosted images.
+  - **Live Contact Form**: Real-time email delivery with spam protection.
 
-### 🛠️ Backend
-- **RESTful API** - Express.js server with organized routes
-- **MongoDB Database** - Mongoose ODM for data modeling
-- **JWT Authentication** - Secure admin panel access
-- **Email Integration** - Nodemailer for contact form
-- **File Upload** - Multer for project images
-- **Visitor Tracking** - Analytics for portfolio visits
+### 🔐 Powerful Admin Panel
+- **Secure Authentication**: JWT-based secure login system covering all admin routes.
+- **Content Management**: 
+  - **Projects**: Create, edit, delete projects with Cloudinary image upload.
+  - **Experiences**: Manage work history with real-time updates.
+- **Toggle Notifications**: Enable/disable email alerts for new visitors directly from the dashboard.
+- **Analytics**: Track visitor stats (optional integration).
 
-### 🔐 Admin Panel
-- **Secure Login** - JWT-based authentication
-- **Project Management** - Full CRUD operations for projects
-- **Experience Management** - Add, edit, delete work experiences
-- **Settings Control** - Toggle email notifications
-- **Responsive Dashboard** - Mobile-friendly admin interface
+### 🛠️ Backend Architecture
+- **Serverless Ready**: Optimized for Vercel Serverless Functions.
+- **Cloud Storage**: **Cloudinary** integration for persistent, high-performance image hosting.
+- **Database**: MongoDB Atlas for scalable data storage.
+- **Security**: CORS protection, Helmet headers, and input sanitization.
 
+---
 
 ## 🛠️ Tech Stack
 
-### Frontend
-- **React** - UI library
-- **Vite** - Build tool
-- **Tailwind CSS** - Utility-first CSS framework
-- **Framer Motion** - Animation library
-- **Axios** - HTTP client
-- **React Router** - Client-side routing
-- **React Scroll** - Smooth scrolling
-- **Lucide React** - Icon library
+| Domain | Technologies |
+|:--- |:--- |
+| **Frontend** | React, Vite, Tailwind CSS, Framer Motion, Axios, Lucide Icons |
+| **Backend** | Node.js, Express.js, JWT, Nodemailer |
+| **Database** | MongoDB Atlas (Mongoose ODM) |
+| **Storage** | Cloudinary (Image CDN) |
+| **Deployment** | Vercel (Frontend & Backend) |
 
-### Backend
-- **Node.js** - Runtime environment
-- **Express.js** - Web framework
-- **MongoDB** - NoSQL database
-- **Mongoose** - ODM for MongoDB
-- **JWT** - Authentication
-- **Nodemailer** - Email service
-- **Multer** - File upload middleware
-- **CORS** - Cross-origin resource sharing
-- **dotenv** - Environment variables
+---
+
+## ⚡ Getting Started
+
+Follow these steps to set up the project locally.
+
+### Prerequisites
+- Node.js (v18+)
+- MongoDB Atlas Account
+- Cloudinary Account (Free Tier)
+- Gmail Account (for email notifications)
+
+### 1. Clone the Repository
+```bash
+git clone https://github.com/im-coderavi/Portfolio.git
+cd Portfolio
+```
+
+### 2. Backend Setup
+```bash
+cd server
+npm install
+```
+
+Create a `.env` file in the `server` directory:
+```env
+# Server Config
+PORT=5000
+MONGODB_URI=your_mongodb_connection_string
+
+# Security
+JWT_SECRET=your_super_secret_key
+ADMIN_PASSWORD=SelectStrongPassword@123
+
+# Email Service (Gmail App Password)
+EMAIL_USER=your_email@gmail.com
+EMAIL_PASS=your_app_password
+RECIPIENT_EMAIL=your_email@gmail.com
+
+# Cloudinary (Image Storage)
+CLOUDINARY_CLOUD_NAME=your_cloud_name
+CLOUDINARY_API_KEY=your_api_key
+CLOUDINARY_API_SECRET=your_api_secret
+```
+
+Start the server:
+```bash
+npm start
+```
+
+### 3. Frontend Setup
+```bash
+cd client
+npm install
+```
+
+Start the development server:
+```bash
+npm run dev
+```
+Open `http://localhost:5173` to view the site.
+
+---
 
 ## 📁 Project Structure
 
-```
+```bash
 PORTFOLIO/
-├── client/                 # Frontend React application
-│   ├── public/            # Static assets
+├── client/              # Frontend (Vite + React)
 │   ├── src/
-│   │   ├── components/    # React components
-│   │   │   ├── admin/     # Admin panel components
-│   │   │   ├── animations/# Animation components
-│   │   │   ├── common/    # Shared components
-│   │   │   └── sections/  # Page sections
-│   │   ├── pages/         # Page components
-│   │   ├── App.jsx        # Main app component
-│   │   └── main.jsx       # Entry point
-│   ├── package.json
-│   └── vite.config.js
-│
-├── server/                # Backend Node.js application
-│   ├── models/           # Mongoose models
-│   │   ├── Project.js
-│   │   ├── Experience.js
-│   │   └── Settings.js
-│   ├── uploads/          # Uploaded files
-│   ├── index.js          # Server entry point
-│   ├── package.json
-│   └── .env              # Environment variables
-│
-└── README.md
+│   │   ├── components/  # Reusable UI components
+│   │   ├── config/      # API configuration
+│   │   ├── pages/       # Route pages (Home, Admin, Login)
+│   │   └── ...
+│   └── ...
+├── server/              # Backend (Express)
+│   ├── models/          # Mongoose Schemas (Project, Experience)
+│   ├── index.js         # Entry point
+│   └── ...
+└── README.md            # Documentation
 ```
 
-## 🚀 Getting Started
+---
 
-### Prerequisites
-- Node.js (v16 or higher)
-- MongoDB (local or Atlas)
-- npm or yarn
+## 🚀 Deployment Guide (Vercel)
 
-### Installation
+This project is optimized for deployment on Vercel.
 
-1. **Clone the repository**
-   ```bash
-   git clone https://github.com/im-coderavi/Portfolio.git
-   cd Portfolio
-   ```
+### Backend Deployment
+1. Push your code to GitHub.
+2. Import the `server` directory as a new project in Vercel.
+3. Select **Express** as the framework preset (or None).
+4. Add all **Environment Variables** from your `.env` file to Vercel Settings.
+5. Deploy!
 
-2. **Setup Backend**
-   ```bash
-   cd server
-   npm install
-   ```
+### Frontend Deployment
+1. Import the `client` directory as a new project in Vercel.
+2. Vercel will auto-detect Vite.
+3. Deploy!
+4. **Note**: The frontend connects to the deployed backend automatically via `config/api.js`.
 
-3. **Configure Environment Variables**
-   
-   Create a `.env` file in the `server` directory:
-   ```env
-   MONGODB_URI=your_mongodb_connection_string
-   JWT_SECRET=your_jwt_secret_key
-   EMAIL_USER=your_email@gmail.com
-   EMAIL_PASS=your_email_app_password
-   RECIPIENT_EMAIL=recipient@email.com
-   ADMIN_PASSWORD=your_admin_password
-   PORT=5000
-   ```
+---
 
-4. **Setup Frontend**
-   ```bash
-   cd ../client
-   npm install
-   ```
+## 🔐 API Documentation
 
-### Running the Application
+| Method | Endpoint | Description | Auth |
+|:--- |:--- |:--- |:--- |
+| `GET` | `/api/projects` | Fetch all projects | Public |
+| `GET` | `/api/experiences` | Fetch all experiences | Public |
+| `POST` | `/api/contact` | Send message | Public |
+| `POST` | `/api/admin/login` | Admin login | Public |
+| `POST` | `/api/admin/projects` | Create project | **Admin** |
+| `PUT` | `/api/admin/projects/:id` | Update project | **Admin** |
+| `DELETE` | `/api/admin/projects/:id` | Delete project | **Admin** |
 
-1. **Start Backend Server**
-   ```bash
-   cd server
-   npm start
-   ```
-   Server will run on `http://localhost:5000`
-
-2. **Start Frontend Development Server**
-   ```bash
-   cd client
-   npm run dev
-   ```
-   Application will run on `http://localhost:5173`
-
-3. **Access Admin Panel**
-   - Navigate to `http://localhost:5173/admin/login`
-   - Use the admin password from your `.env` file
-
-## 📝 API Endpoints
-
-### Public Routes
-- `GET /api/projects` - Get all projects
-- `GET /api/experiences` - Get all experiences
-- `POST /api/contact` - Send contact message
-- `POST /api/visitor` - Track visitor
-
-### Protected Routes (Admin)
-- `POST /api/admin/login` - Admin login
-- `POST /api/admin/projects` - Create project
-- `PUT /api/admin/projects/:id` - Update project
-- `DELETE /api/admin/projects/:id` - Delete project
-- `POST /api/admin/experiences` - Create experience
-- `PUT /api/admin/experiences/:id` - Update experience
-- `DELETE /api/admin/experiences/:id` - Delete experience
-- `GET /api/admin/settings` - Get settings
-- `PUT /api/admin/settings` - Update settings
-
-## 🎨 Features Breakdown
-
-### Experience Section
-- Professional timeline layout
-- Bullet point support in descriptions
-- Current position highlighting
-- Technology tags
-- Responsive design with proper text wrapping
-- Left-aligned content for better readability
-
-### Projects Section
-- Image upload functionality
-- Technology filtering
-- Featured projects
-- Live demo and GitHub links
-- Responsive grid layout
-
-### Contact Form
-- Email validation
-- Nodemailer integration
-- Success/error notifications
-- Spam protection
-
-### Admin Dashboard
-- Tab-based navigation
-- Real-time updates
-- Image preview
-- Form validation
-- Confirmation dialogs
-
-## 🔒 Security Features
-
-- JWT-based authentication
-- Password hashing
-- Protected API routes
-- CORS configuration
-- Input validation
-- XSS protection
-
-## 📱 Responsive Design
-
-- Mobile-first approach
-- Breakpoints: `sm`, `md`, `lg`, `xl`
-- Touch-friendly UI elements
-- Optimized images
-- Flexible layouts
-
-## 🎯 Performance Optimizations
-
-- Code splitting
-- Lazy loading
-- Image optimization
-- Minified production builds
-- Efficient re-renders
-- Debounced API calls
-
-## 🚀 Deployment
-
-### Frontend (Vercel/Netlify)
-1. Build the project: `npm run build`
-2. Deploy the `dist` folder
-3. Set environment variables
-
-### Backend (Heroku/Railway)
-1. Push to Git repository
-2. Connect to hosting platform
-3. Set environment variables
-4. Deploy
+---
 
 ## 🤝 Contributing
 
-Contributions are welcome! Please follow these steps:
+Contributions are welcome! Please feel free to submit a Pull Request.
 
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the branch (`git push origin feature/AmazingFeature`)
+1. Fork the Project
+2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the Branch (`git push origin feature/AmazingFeature`)
 5. Open a Pull Request
+
+---
 
 ## 📄 License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## 👤 Author
-
-**Avishek Giri**
-- Portfolio: [avishekgiri.dev](https://avishekgiri.dev)
-- LinkedIn: [@avishekgiri](https://linkedin.com/in/avishekgiri)
-- GitHub: [@avishekgiri](https://github.com/avishekgiri)
-- Email: avishekgiri31@gmail.com
-
-## 🙏 Acknowledgments
-
-- [Framer Motion](https://www.framer.com/motion/) - Animation library
-- [Lucide Icons](https://lucide.dev/) - Beautiful icons
-- [Tailwind CSS](https://tailwindcss.com/) - CSS framework
-- [MongoDB Atlas](https://www.mongodb.com/cloud/atlas) - Database hosting
-
-## 📊 Project Stats
-
-- **Total Lines of Code**: ~5000+
-- **Components**: 20+
-- **API Endpoints**: 15+
-- **Technologies Used**: 15+
+Distributed under the MIT License. See `LICENSE` for more information.
 
 ---
 
 <div align="center">
-  Made with ❤️ by Avishek Giri
-  
-  ⭐ Star this repo if you found it helpful!
-</div>
 
+**Made with ❤️ by [Avishek Giri](https://avishekgiri.dev)**
+
+</div>
