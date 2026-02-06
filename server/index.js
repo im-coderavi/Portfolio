@@ -19,6 +19,11 @@ const Experience = require('./models/Experience');
 const app = express();
 const PORT = process.env.PORT || 5000;
 
+// Debug: Check if key env vars are loaded
+console.log('Environment Check:');
+console.log('MONGODB_URI defined:', !!process.env.MONGODB_URI);
+console.log('CLOUDINARY_CLOUD_NAME defined:', !!process.env.CLOUDINARY_CLOUD_NAME);
+
 // Cloudinary Configuration
 cloudinary.config({
     cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
@@ -357,7 +362,11 @@ app.get('/api/projects', async (req, res) => {
         });
     } catch (error) {
         console.error('Error fetching projects:', error);
-        res.status(500).json({ success: false, message: 'Failed to fetch projects' });
+        res.status(500).json({
+            success: false,
+            message: 'Failed to fetch projects',
+            error: error.message // Expose error for debugging
+        });
     }
 });
 
