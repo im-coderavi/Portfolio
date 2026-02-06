@@ -4,6 +4,7 @@ import { Plus, Loader2, Trash2, Edit, Briefcase, MapPin, Calendar } from 'lucide
 import axios from 'axios';
 import Button from '../common/Button';
 import FadeIn from '../animations/FadeIn';
+import API_URL from '../../config/api';
 
 const ExperienceManager = () => {
     const [experiences, setExperiences] = useState([]);
@@ -23,7 +24,7 @@ const ExperienceManager = () => {
 
     const fetchExperiences = async () => {
         try {
-            const response = await axios.get('http://localhost:5000/api/experiences');
+            const response = await axios.get('/api/experiences');
             if (response.data.success) {
                 setExperiences(response.data.experiences);
             }
@@ -57,13 +58,13 @@ const ExperienceManager = () => {
 
             if (editingExperience) {
                 await axios.put(
-                    `http://localhost:5000/api/admin/experiences/${editingExperience._id}`,
+                    `/api/admin/experiences/${editingExperience._id}`,
                     dataToSend,
                     { headers: { Authorization: `Bearer ${token}` } }
                 );
             } else {
                 await axios.post(
-                    'http://localhost:5000/api/admin/experiences',
+                    '/api/admin/experiences',
                     dataToSend,
                     { headers: { Authorization: `Bearer ${token}` } }
                 );
@@ -96,7 +97,7 @@ const ExperienceManager = () => {
 
         try {
             const token = localStorage.getItem('adminToken');
-            await axios.delete(`http://localhost:5000/api/admin/experiences/${id}`, {
+            await axios.delete(`/api/admin/experiences/${id}`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             fetchExperiences();

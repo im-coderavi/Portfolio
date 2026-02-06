@@ -62,7 +62,36 @@ const upload = multer({
 });
 
 // Middleware
-app.use(cors());
+const corsOptions = {
+    origin: function (origin, callback) {
+        // Allow requests with no origin (like mobile apps or curl requests)
+        if (!origin) return callback(null, true);
+
+        // Allow localhost and Vercel deployments
+        const allowedOrigins = [
+            'http://localhost:5173',
+            'http://localhost:3000',
+            /\.vercel\.app$/  // Allow all Vercel deployments
+        ];
+
+        const isAllowed = allowedOrigins.some(allowed => {
+            if (allowed instanceof RegExp) {
+                return allowed.test(origin);
+            }
+            return allowed === origin;
+        });
+
+        if (isAllowed) {
+            callback(null, true);
+        } else {
+            callback(new Error('Not allowed by CORS'));
+        }
+    },
+    credentials: true,
+    optionsSuccessStatus: 200
+};
+
+app.use(cors(corsOptions));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
@@ -541,9 +570,15 @@ app.get('/api/health', (req, res) => {
     });
 });
 
-// Start server
-app.listen(PORT, () => {
-    console.log(`🚀 Server is running on port ${PORT}`);
-    console.log(`📧 Email service configured for: ${process.env.EMAIL_USER}`);
-    console.log(`🔐 Admin panel enabled`);
-});
+// Start server (only in development, not on Vercel)
+if (process.env.NODE_ENV !== 'production') {
+    app.listen(PORT, () => {
+        console.log(`🚀 Server is running on port ${PORT}`);
+        console.log(`📧 Email service configured for: ${process.env.EMAIL_USER}`);
+        console.log(`🔐 Admin panel enabled`);
+    });
+}
+
+// Export for Vercel serverless
+module.exports = app;
+

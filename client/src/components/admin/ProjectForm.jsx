@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { X, Upload, Save, Image as ImageIcon } from 'lucide-react';
 import Button from '../common/Button';
+import API_URL from '../../config/api';
 
 const ProjectForm = ({ initialData, onSubmit, onCancel }) => {
     const [formData, setFormData] = useState({
@@ -25,7 +26,7 @@ const ProjectForm = ({ initialData, onSubmit, onCancel }) => {
             });
             // Handle existing image for preview
             if (initialData.image) {
-                setPreviewUrl(initialData.image.startsWith('http') ? initialData.image : `http://localhost:5000${initialData.image}`);
+                setPreviewUrl(initialData.image.startsWith('http') ? initialData.image : `${initialData.image}`);
             }
         }
     }, [initialData]);

@@ -7,6 +7,7 @@ import FadeIn from '../components/animations/FadeIn';
 import Button from '../components/common/Button';
 import ProjectForm from '../components/admin/ProjectForm';
 import ExperienceManager from '../components/admin/ExperienceManager';
+import API_URL from '../config/api';
 
 const Admin = () => {
     const [activeTab, setActiveTab] = useState('projects');
@@ -19,7 +20,7 @@ const Admin = () => {
 
     const fetchProjects = async () => {
         try {
-            const response = await axios.get('http://localhost:5000/api/projects');
+            const response = await axios.get('/api/projects');
             if (response.data.success) {
                 setProjects(response.data.projects);
             }
@@ -33,7 +34,7 @@ const Admin = () => {
     const fetchSettings = async () => {
         try {
             const token = localStorage.getItem('adminToken');
-            const response = await axios.get('http://localhost:5000/api/admin/settings', {
+            const response = await axios.get('/api/admin/settings', {
                 headers: { Authorization: `Bearer ${token}` }
             });
             if (response.data.success) {
@@ -51,7 +52,7 @@ const Admin = () => {
             // Optimistic update
             setNotificationsEnabled(newState);
 
-            await axios.post('http://localhost:5000/api/admin/settings', {
+            await axios.post('/api/admin/settings', {
                 notificationsEnabled: newState
             }, {
                 headers: { Authorization: `Bearer ${token}` }
@@ -81,7 +82,7 @@ const Admin = () => {
     const handleCreate = async (projectData) => {
         try {
             const token = localStorage.getItem('adminToken');
-            await axios.post('http://localhost:5000/api/admin/projects', projectData, {
+            await axios.post('/api/admin/projects', projectData, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             fetchProjects();
@@ -95,7 +96,7 @@ const Admin = () => {
         try {
             const token = localStorage.getItem('adminToken');
             await axios.put(
-                `http://localhost:5000/api/admin/projects/${editingProject._id}`,
+                `/api/admin/projects/${editingProject._id}`,
                 projectData,
                 { headers: { Authorization: `Bearer ${token}` } }
             );
@@ -111,7 +112,7 @@ const Admin = () => {
 
         try {
             const token = localStorage.getItem('adminToken');
-            await axios.delete(`http://localhost:5000/api/admin/projects/${id}`, {
+            await axios.delete(`/api/admin/projects/${id}`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             fetchProjects();
@@ -227,7 +228,7 @@ const Admin = () => {
                                 >
                                     <div className="aspect-video relative overflow-hidden">
                                         <img
-                                            src={project.image?.startsWith('http') ? project.image : `http://localhost:5000${project.image}`}
+                                            src={project.image?.startsWith('http') ? project.image : `${project.image}`}
                                             alt={project.title}
                                             className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                                         />
