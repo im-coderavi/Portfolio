@@ -96,7 +96,9 @@ const corsOptions = {
 app.use(cors(corsOptions));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
+// Serve uploaded files
+app.use('/uploads', express.static(uploadDir));
 
 // MongoDB Connection with caching for serverless
 let cachedDb = null;
@@ -144,6 +146,20 @@ const verifyToken = (req, res, next) => {
         res.status(401).json({ success: false, message: 'Invalid or expired token.' });
     }
 };
+
+// Middleware to ensure MongoDB connection before API routes
+const ensureDbConnection = async (req, res, next) => {
+    try {
+        await connectToDatabase();
+        next();
+    } catch (error) {
+        console.error('Database connection failed:', error);
+        res.status(503).json({ success: false, message: 'Database connection unavailable' });
+    }
+};
+
+// Apply database connection middleware to all API routes
+app.use('/api', ensureDbConnection);
 
 // ==================== EMAIL SERVICES ====================
 
