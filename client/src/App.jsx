@@ -50,29 +50,7 @@ function App() {
   const isAdminRoute = location.pathname.startsWith('/admin');
 
   // Track visitor on website load (only for main portfolio)
-  useEffect(() => {
-    if (!isAdminRoute) {
-      const trackVisitor = async () => {
-        try {
-          await fetch(`${API_URL}/api/visitor`, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-              timestamp: new Date().toISOString(),
-              userAgent: navigator.userAgent,
-              referrer: document.referrer,
-              language: navigator.language,
-            }),
-          });
-        } catch (error) {
-          console.log('Visitor tracking failed:', error);
-        }
-      };
-      trackVisitor();
-    }
-  }, [isAdminRoute]);
+  /* Visitor tracking removed */
 
   return (
     <HelmetProvider>
