@@ -1,16 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Plus, Loader2, Link as LinkIcon, Trash2, Edit, LogOut, Bell, BellOff, Briefcase, FolderKanban } from 'lucide-react';
+import { Plus, Loader2, Link as LinkIcon, Trash2, Edit, LogOut, Bell, BellOff, Briefcase, FolderKanban, LayoutDashboard } from 'lucide-react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import FadeIn from '../components/animations/FadeIn';
 import Button from '../components/common/Button';
 import ProjectForm from '../components/admin/ProjectForm';
 import ExperienceManager from '../components/admin/ExperienceManager';
+import TrafficStats from '../components/admin/TrafficStats';
 import API_URL from '../config/api';
 
 const Admin = () => {
-    const [activeTab, setActiveTab] = useState('projects');
+    const [activeTab, setActiveTab] = useState('dashboard');
     const [projects, setProjects] = useState([]);
     const [loading, setLoading] = useState(true);
     const [showForm, setShowForm] = useState(false);
@@ -175,6 +176,16 @@ const Admin = () => {
                     {/* Tab Navigation */}
                     <div className="flex gap-2">
                         <button
+                            onClick={() => setActiveTab('dashboard')}
+                            className={`flex items-center gap-2 px-6 py-3 rounded-xl font-medium transition-all ${activeTab === 'dashboard'
+                                ? 'bg-accent-cyan text-black'
+                                : 'bg-white/5 text-text-secondary hover:bg-white/10'
+                                }`}
+                        >
+                            <LayoutDashboard size={20} />
+                            Dashboard
+                        </button>
+                        <button
                             onClick={() => setActiveTab('projects')}
                             className={`flex items-center gap-2 px-6 py-3 rounded-xl font-medium transition-all ${activeTab === 'projects'
                                 ? 'bg-accent-cyan text-black'
@@ -198,7 +209,9 @@ const Admin = () => {
                 </header>
 
                 {/* Tab Content */}
-                {activeTab === 'projects' ? (
+                {activeTab === 'dashboard' && <TrafficStats />}
+
+                {activeTab === 'projects' && (
                     <>
                         {showForm || editingProject ? (
                             <FadeIn>
@@ -289,9 +302,9 @@ const Admin = () => {
                             ))}
                         </div>
                     </>
-                ) : (
-                    <ExperienceManager />
                 )}
+
+                {activeTab === 'experiences' && <ExperienceManager />}
             </div>
         </div>
     );
