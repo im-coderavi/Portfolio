@@ -96,28 +96,45 @@ if (fs.existsSync(uploadDir)) {
 // MongoDB Connection with caching for serverless
 let cachedDb = null;
 
-async function connectToDatabase() {
+async function connectToDatabase(retries = 3) {
     if (cachedDb && mongoose.connection.readyState === 1) {
+        console.log('✅ Using cached MongoDB connection');
         return cachedDb;
     }
 
-    try {
-        await mongoose.connect(process.env.MONGODB_URI, {
-            serverSelectionTimeoutMS: 30000, // 30 seconds for serverless cold start
-            socketTimeoutMS: 45000,
-            bufferCommands: false, // Disable buffering
-        });
+    let lastError;
+    for (let attempt = 1; attempt <= retries; attempt++) {
+        try {
+            console.log(`🔄 MongoDB connection attempt ${attempt}/${retries}...`);
 
-        // Set buffer timeout to prevent hanging operations
-        mongoose.set('bufferTimeoutMS', 30000);
-        console.log('✅ Connected to MongoDB Atlas');
-        cachedDb = mongoose.connection;
-        // Note: Settings will be initialized on first admin access
-        return cachedDb;
-    } catch (err) {
-        console.error('❌ MongoDB connection error:', err);
-        throw err;
+            await mongoose.connect(process.env.MONGODB_URI, {
+                serverSelectionTimeoutMS: 30000, // 30 seconds for serverless cold start
+                socketTimeoutMS: 45000,
+                bufferCommands: false, // Disable buffering
+            });
+
+            // Set buffer timeout to prevent hanging operations
+            mongoose.set('bufferTimeoutMS', 30000);
+            console.log('✅ Connected to MongoDB Atlas');
+            cachedDb = mongoose.connection;
+            // Note: Settings will be initialized on first admin access
+            return cachedDb;
+        } catch (err) {
+            lastError = err;
+            console.error(`❌ MongoDB connection attempt ${attempt}/${retries} failed:`, err.message);
+
+            // If this isn't the last attempt, wait before retrying
+            if (attempt < retries) {
+                const waitTime = attempt * 1000; // Exponential backoff: 1s, 2s, 3s
+                console.log(`⏳ Waiting ${waitTime}ms before retry...`);
+                await new Promise(resolve => setTimeout(resolve, waitTime));
+            }
+        }
     }
+
+    // All retries failed
+    console.error('❌ All MongoDB connection attempts failed');
+    throw lastError;
 }
 
 // Initialize connection
@@ -349,18 +366,32 @@ app.get('/api/public-settings', async (req, res) => {
 // Get all projects (public)
 app.get('/api/projects', async (req, res) => {
     try {
+        console.log('📊 [/api/projects] Request received');
+        console.log('📊 [/api/projects] MongoDB connection state:', mongoose.connection.readyState);
+
         await connectToDatabase(); // Ensure connection
+        console.log('📊 [/api/projects] Database connected, fetching projects...');
+
         const projects = await Project.find().sort({ order: 1, createdAt: -1 });
+        console.log(`📊 [/api/projects] Found ${projects.length} projects`);
+
         res.status(200).json({
             success: true,
             projects
         });
     } catch (error) {
-        console.error('Error fetching projects:', error);
+        console.error('❌ [/api/projects] Error fetching projects:');
+        console.error('❌ Error name:', error.name);
+        console.error('❌ Error message:', error.message);
+        console.error('❌ Error stack:', error.stack);
+        console.error('❌ MongoDB state:', mongoose.connection.readyState);
+
         res.status(500).json({
             success: false,
             message: 'Failed to fetch projects',
-            error: error.message // Expose error for debugging
+            error: error.message,
+            errorType: error.name,
+            dbState: mongoose.connection.readyState
         });
     }
 });
@@ -489,15 +520,33 @@ app.delete('/api/admin/projects/:id', verifyToken, async (req, res) => {
 // Get all experiences (public)
 app.get('/api/experiences', async (req, res) => {
     try {
+        console.log('💼 [/api/experiences] Request received');
+        console.log('💼 [/api/experiences] MongoDB connection state:', mongoose.connection.readyState);
+
         await connectToDatabase(); // Ensure connection
+        console.log('💼 [/api/experiences] Database connected, fetching experiences...');
+
         const experiences = await Experience.find().sort({ order: 1, startDate: -1 });
+        console.log(`💼 [/api/experiences] Found ${experiences.length} experiences`);
+
         res.status(200).json({
             success: true,
             experiences
         });
     } catch (error) {
-        console.error('Error fetching experiences:', error);
-        res.status(500).json({ success: false, message: 'Failed to fetch experiences' });
+        console.error('❌ [/api/experiences] Error fetching experiences:');
+        console.error('❌ Error name:', error.name);
+        console.error('❌ Error message:', error.message);
+        console.error('❌ Error stack:', error.stack);
+        console.error('❌ MongoDB state:', mongoose.connection.readyState);
+
+        res.status(500).json({
+            success: false,
+            message: 'Failed to fetch experiences',
+            error: error.message,
+            errorType: error.name,
+            dbState: mongoose.connection.readyState
+        });
     }
 });
 
@@ -605,6 +654,70 @@ app.get('/api/health', (req, res) => {
         message: 'Server is running',
         timestamp: new Date().toISOString()
     });
+});
+
+// Database status endpoint for debugging
+app.get('/api/db-status', async (req, res) => {
+    try {
+        console.log('🔍 [/api/db-status] Checking database status...');
+
+        // Connection state mapping
+        const states = {
+            0: 'disconnected',
+            1: 'connected',
+            2: 'connecting',
+            3: 'disconnecting'
+        };
+
+        const connectionState = mongoose.connection.readyState;
+        console.log('🔍 Connection state:', states[connectionState]);
+
+        // Try to connect if not connected
+        if (connectionState !== 1) {
+            console.log('🔍 Attempting to connect...');
+            await connectToDatabase();
+        }
+
+        // Get collection stats
+        const projectCount = await Project.countDocuments();
+        const experienceCount = await Experience.countDocuments();
+        const settingsCount = await Settings.countDocuments();
+
+        console.log(`🔍 Collections - Projects: ${projectCount}, Experiences: ${experienceCount}, Settings: ${settingsCount}`);
+
+        res.status(200).json({
+            success: true,
+            database: {
+                connected: mongoose.connection.readyState === 1,
+                state: states[mongoose.connection.readyState],
+                host: mongoose.connection.host || 'N/A',
+                name: mongoose.connection.name || 'N/A'
+            },
+            collections: {
+                projects: projectCount,
+                experiences: experienceCount,
+                settings: settingsCount
+            },
+            environment: {
+                nodeEnv: process.env.NODE_ENV || 'development',
+                mongodbConfigured: !!process.env.MONGODB_URI,
+                cloudinaryConfigured: !!process.env.CLOUDINARY_CLOUD_NAME
+            },
+            timestamp: new Date().toISOString()
+        });
+    } catch (error) {
+        console.error('❌ [/api/db-status] Error:', error);
+        res.status(500).json({
+            success: false,
+            error: error.message,
+            errorType: error.name,
+            database: {
+                connected: false,
+                state: 'error'
+            },
+            timestamp: new Date().toISOString()
+        });
+    }
 });
 
 // Start server (only in development, not on Vercel)
