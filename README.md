@@ -76,25 +76,6 @@ This portfolio is not just a showcase of work; it's a statement of engineering e
 
 ---
 
-## 🏗️ Architecture
-
-```mermaid
-graph TD
-    Client[Client (React + Vite)]
-    Server[Server (Express + Node.js)]
-    DB[(MongoDB Atlas)]
-    Cloud[Cloudinary]
-    Email[Gmail SMTP]
-
-    Client -->|API Requests (Axios)| Server
-    Server -->|Auth & Logic| Client
-    Server -->|Query/Update| DB
-    Server -->|Upload/Delete Images| Cloud
-    Server -->|Send Notifications| Email
-    Cloud -->|Serve Images (CDN)| Client
-```
-
----
 
 ## ⚡ Getting Started
 
