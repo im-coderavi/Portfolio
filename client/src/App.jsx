@@ -57,7 +57,7 @@ function App() {
     <HelmetProvider>
       <div className="min-h-screen bg-primary-dark text-white">
         <Suspense fallback={<div className="h-screen flex items-center justify-center"><Loading /></div>}>
-          <SEOManager />
+          {/* <SEOManager /> */}
           <Routes>
             <Route path="/" element={<Portfolio />} />
             <Route path="/admin" element={<Admin />} />

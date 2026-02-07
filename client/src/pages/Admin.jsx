@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Plus, Loader2, Link as LinkIcon, Trash2, Edit, LogOut, Bell, BellOff, Briefcase, FolderKanban, Settings, Save } from 'lucide-react';
+import { Plus, Loader2, Link as LinkIcon, Trash2, Edit, LogOut, Bell, BellOff, Briefcase, FolderKanban, Settings as SettingsIcon, Save as SaveIcon } from 'lucide-react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import FadeIn from '../components/animations/FadeIn';
@@ -226,7 +226,7 @@ const Admin = () => {
                                 : 'bg-white/5 text-text-secondary hover:bg-white/10'
                                 }`}
                         >
-                            <Settings size={20} />
+                            <SettingsIcon size={20} />
                             Settings
                         </button>
                     </div>
@@ -333,7 +333,7 @@ const Admin = () => {
                     <FadeIn>
                         <div className="bg-white/5 border border-white/10 rounded-2xl p-8">
                             <h2 className="text-2xl font-bold text-white mb-6 flex items-center gap-2">
-                                <Settings className="text-accent-cyan" />
+                                <SettingsIcon className="text-accent-cyan" />
                                 AdSense & SEO Settings
                             </h2>
                             <form onSubmit={handleSaveSettings} className="space-y-6">
@@ -376,7 +376,7 @@ const Admin = () => {
                                     <Button
                                         type="submit"
                                         variant="primary"
-                                        icon={Save}
+                                        icon={SaveIcon}
                                     >
                                         Save Settings
                                     </Button>
