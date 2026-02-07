@@ -56,9 +56,9 @@ const Contact = () => {
     ];
 
     const socialLinks = [
-        { icon: Linkedin, url: 'https://linkedin.com/in/avishekgiri', label: 'LinkedIn' },
-        { icon: Github, url: 'https://github.com/avishekgiri', label: 'GitHub' },
-        { icon: Globe, url: 'https://avishekgiri.dev', label: 'Portfolio' },
+        { icon: Linkedin, url: 'https://www.linkedin.com/in/im-coderavi/', label: 'LinkedIn' },
+        { icon: Github, url: 'https://github.com/im-coderavi', label: 'GitHub' },
+        { icon: Globe, url: 'https://www.coderavi.in/', label: 'Portfolio' },
     ];
 
     return (
