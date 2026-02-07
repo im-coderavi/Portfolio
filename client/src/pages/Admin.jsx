@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Plus, Loader2, Link as LinkIcon, Trash2, Edit, LogOut, Bell, BellOff, Briefcase, FolderKanban } from 'lucide-react';
+import { Plus, Loader2, Link as LinkIcon, Trash2, Edit, LogOut, Bell, BellOff, Briefcase, FolderKanban, Settings, Save } from 'lucide-react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import FadeIn from '../components/animations/FadeIn';
@@ -16,6 +16,9 @@ const Admin = () => {
     const [showForm, setShowForm] = useState(false);
     const [editingProject, setEditingProject] = useState(null);
     const [notificationsEnabled, setNotificationsEnabled] = useState(true);
+    const [adsenseCode, setAdsenseCode] = useState('');
+    const [adsTxt, setAdsTxt] = useState('');
+    const [metaTags, setMetaTags] = useState('');
     const navigate = useNavigate();
 
     const fetchProjects = async () => {
@@ -39,6 +42,9 @@ const Admin = () => {
             });
             if (response.data.success) {
                 setNotificationsEnabled(response.data.settings.notificationsEnabled);
+                setAdsenseCode(response.data.settings.adsenseCode || '');
+                setAdsTxt(response.data.settings.adsTxt || '');
+                setMetaTags(response.data.settings.metaTags || '');
             }
         } catch (error) {
             console.error('Failed to fetch settings', error);
@@ -61,6 +67,25 @@ const Admin = () => {
             console.error('Failed to update settings', error);
             setNotificationsEnabled(!notificationsEnabled); // Revert on error
             alert('Failed to update notification settings');
+        }
+    };
+
+    const handleSaveSettings = async (e) => {
+        e.preventDefault();
+        try {
+            const token = localStorage.getItem('adminToken');
+            await axios.post(`${API_URL}/api/admin/settings`, {
+                notificationsEnabled,
+                adsenseCode,
+                adsTxt,
+                metaTags
+            }, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            alert('Settings saved successfully');
+        } catch (error) {
+            console.error('Failed to save settings', error);
+            alert('Failed to save settings');
         }
     };
 
@@ -194,6 +219,16 @@ const Admin = () => {
                             <Briefcase size={20} />
                             Experiences
                         </button>
+                        <button
+                            onClick={() => setActiveTab('settings')}
+                            className={`flex items-center gap-2 px-6 py-3 rounded-xl font-medium transition-all ${activeTab === 'settings'
+                                ? 'bg-accent-cyan text-black'
+                                : 'bg-white/5 text-text-secondary hover:bg-white/10'
+                                }`}
+                        >
+                            <Settings size={20} />
+                            Settings
+                        </button>
                     </div>
                 </header>
 
@@ -293,6 +328,63 @@ const Admin = () => {
                 )}
 
                 {activeTab === 'experiences' && <ExperienceManager />}
+
+                {activeTab === 'settings' && (
+                    <FadeIn>
+                        <div className="bg-white/5 border border-white/10 rounded-2xl p-8">
+                            <h2 className="text-2xl font-bold text-white mb-6 flex items-center gap-2">
+                                <Settings className="text-accent-cyan" />
+                                AdSense & SEO Settings
+                            </h2>
+                            <form onSubmit={handleSaveSettings} className="space-y-6">
+                                <div>
+                                    <label className="block text-text-secondary mb-2 font-medium">Google AdSense Code</label>
+                                    <p className="text-xs text-text-secondary mb-2">Paste the script tag provided by Google AdSense here.</p>
+                                    <textarea
+                                        value={adsenseCode}
+                                        onChange={(e) => setAdsenseCode(e.target.value)}
+                                        className="w-full bg-primary-dark/50 border border-white/10 rounded-xl p-4 text-white focus:border-accent-cyan focus:outline-none h-32 font-mono text-sm"
+                                        placeholder="&lt;script async src=&quot;...&quot;&gt;&lt;/script&gt;"
+                                    />
+                                </div>
+
+                                <div>
+                                    <label className="block text-text-secondary mb-2 font-medium">Ads.txt Content</label>
+                                    <p className="text-xs text-text-secondary mb-2">
+                                        Content for your /ads.txt file. Verification: <a href="/ads.txt" target="_blank" className="text-accent-cyan hover:underline">View ads.txt</a>
+                                    </p>
+                                    <textarea
+                                        value={adsTxt}
+                                        onChange={(e) => setAdsTxt(e.target.value)}
+                                        className="w-full bg-primary-dark/50 border border-white/10 rounded-xl p-4 text-white focus:border-accent-cyan focus:outline-none h-32 font-mono text-sm"
+                                        placeholder="google.com, pub-0000000000000000, DIRECT, f08c47fec0942fa0"
+                                    />
+                                </div>
+
+                                <div>
+                                    <label className="block text-text-secondary mb-2 font-medium">Additional Meta Tags</label>
+                                    <p className="text-xs text-text-secondary mb-2">Any other verification meta tags (e.g., Google Search Console).</p>
+                                    <textarea
+                                        value={metaTags}
+                                        onChange={(e) => setMetaTags(e.target.value)}
+                                        className="w-full bg-primary-dark/50 border border-white/10 rounded-xl p-4 text-white focus:border-accent-cyan focus:outline-none h-32 font-mono text-sm"
+                                        placeholder="&lt;meta name=&quot;google-site-verification&quot; content=&quot;...&quot; /&gt;"
+                                    />
+                                </div>
+
+                                <div className="flex justify-end">
+                                    <Button
+                                        type="submit"
+                                        variant="primary"
+                                        icon={Save}
+                                    >
+                                        Save Settings
+                                    </Button>
+                                </div>
+                            </form>
+                        </div>
+                    </FadeIn>
+                )}
             </div>
         </div>
     );

@@ -296,17 +296,51 @@ app.get('/api/admin/settings', verifyToken, async (req, res) => {
 // Update Settings (Protected)
 app.post('/api/admin/settings', verifyToken, async (req, res) => {
     try {
-        const { notificationsEnabled } = req.body;
+        const { notificationsEnabled, adsenseCode, adsTxt, metaTags } = req.body;
+
+        const updateData = { notificationsEnabled, updatedAt: Date.now() };
+        if (adsenseCode !== undefined) updateData.adsenseCode = adsenseCode;
+        if (adsTxt !== undefined) updateData.adsTxt = adsTxt;
+        if (metaTags !== undefined) updateData.metaTags = metaTags;
 
         const settings = await Settings.findOneAndUpdate(
             {},
-            { notificationsEnabled, updatedAt: Date.now() },
+            updateData,
             { new: true, upsert: true }
         );
 
         res.status(200).json({ success: true, message: 'Settings updated', settings });
     } catch (error) {
         res.status(500).json({ success: false, message: 'Failed to update settings' });
+    }
+});
+
+// Serve ads.txt (public)
+app.get('/ads.txt', async (req, res) => {
+    try {
+        await connectToDatabase();
+        const settings = await Settings.findOne();
+        res.header('Content-Type', 'text/plain');
+        res.send(settings ? settings.adsTxt || '' : '');
+    } catch (error) {
+        console.error('Error serving ads.txt:', error);
+        res.status(500).send('');
+    }
+});
+
+// Get Public Settings (public) - for injecting scripts/tags
+app.get('/api/public-settings', async (req, res) => {
+    try {
+        await connectToDatabase();
+        const settings = await Settings.findOne();
+        res.status(200).json({
+            success: true,
+            adsenseCode: settings ? settings.adsenseCode : '',
+            metaTags: settings ? settings.metaTags : ''
+        });
+    } catch (error) {
+        console.error('Error fetching public settings:', error);
+        res.status(500).json({ success: false, message: 'Failed to fetch settings' });
     }
 });
 

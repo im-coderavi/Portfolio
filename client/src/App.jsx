@@ -8,6 +8,7 @@ import ScrollProgress from './components/common/ScrollProgress';
 import Hero from './components/sections/Hero';
 import SEO from './components/common/SEO';
 import Loading from './components/common/Loading';
+import SEOManager from './components/common/SEOManager';
 
 // Lazy load heavy sections
 const About = lazy(() => import('./components/sections/About'));
@@ -56,6 +57,7 @@ function App() {
     <HelmetProvider>
       <div className="min-h-screen bg-primary-dark text-white">
         <Suspense fallback={<div className="h-screen flex items-center justify-center"><Loading /></div>}>
+          <SEOManager />
           <Routes>
             <Route path="/" element={<Portfolio />} />
             <Route path="/admin" element={<Admin />} />

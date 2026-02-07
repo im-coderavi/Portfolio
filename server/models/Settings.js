@@ -5,6 +5,18 @@ const settingsSchema = new mongoose.Schema({
         type: Boolean,
         default: true
     },
+    adsenseCode: {
+        type: String,
+        default: ''
+    },
+    adsTxt: {
+        type: String,
+        default: ''
+    },
+    metaTags: {
+        type: String,
+        default: ''
+    },
     updatedAt: {
         type: Date,
         default: Date.now
