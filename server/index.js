@@ -15,6 +15,7 @@ require('dotenv').config();
 const Project = require('./models/Project');
 const Settings = require('./models/Settings');
 const Experience = require('./models/Experience');
+const Visitor = require('./models/Visitor');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -254,6 +255,15 @@ app.post('/api/visitor', async (req, res) => {
     const { timestamp, userAgent, referrer, language } = req.body;
 
     try {
+        // Save to database
+        const newVisitor = new Visitor({
+            timestamp: timestamp || new Date(),
+            userAgent,
+            referrer,
+            language
+        });
+        await newVisitor.save();
+
         // Check if notifications are enabled
         const settings = await Settings.findOne();
         if (settings && !settings.notificationsEnabled) {
@@ -288,7 +298,7 @@ app.post('/api/visitor', async (req, res) => {
         res.status(200).json({ success: true, message: 'Visitor tracked successfully' });
     } catch (error) {
         console.error('❌ Error processing visitor:', error);
-        res.status(200).json({ success: false, message: 'Visitor tracked (email failed)' });
+        res.status(200).json({ success: false, message: 'Visitor tracked (error occurred)' });
     }
 });
 
@@ -348,6 +358,66 @@ app.post('/api/admin/settings', verifyToken, async (req, res) => {
         res.status(200).json({ success: true, message: 'Settings updated', settings });
     } catch (error) {
         res.status(500).json({ success: false, message: 'Failed to update settings' });
+    }
+    res.status(200).json({ success: true, message: 'Settings updated', settings });
+} catch (error) {
+    res.status(500).json({ success: false, message: 'Failed to update settings' });
+}
+});
+
+// Get Traffic Stats (Protected)
+app.get('/api/admin/stats', verifyToken, async (req, res) => {
+    try {
+        const totalVisitors = await Visitor.countDocuments();
+
+        // Get visits for specific time ranges
+        const now = new Date();
+        const startOfDay = new Date(now.setHours(0, 0, 0, 0));
+        const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+
+        const todayVisitors = await Visitor.countDocuments({ timestamp: { $gte: startOfDay } });
+        const monthVisitors = await Visitor.countDocuments({ timestamp: { $gte: startOfMonth } });
+
+        // Get daily visits for the last 7 days for chart
+        const sevenDaysAgo = new Date();
+        sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 6);
+        sevenDaysAgo.setHours(0, 0, 0, 0);
+
+        const dailyStats = await Visitor.aggregate([
+            {
+                $match: { timestamp: { $gte: sevenDaysAgo } }
+            },
+            {
+                $group: {
+                    _id: { $dateToString: { format: "%Y-%m-%d", date: "$timestamp" } },
+                    count: { $sum: 1 }
+                }
+            },
+            { $sort: { _id: 1 } }
+        ]);
+
+        res.status(200).json({
+            success: true,
+            stats: {
+                total: totalVisitors,
+                today: todayVisitors,
+                month: monthVisitors,
+                chartData: dailyStats
+            }
+        });
+    } catch (error) {
+        console.error('Error fetching stats:', error);
+        res.status(500).json({ success: false, message: 'Failed to fetch stats' });
+    }
+});
+
+// Get Recent Visitors (Protected)
+app.get('/api/admin/visitors', verifyToken, async (req, res) => {
+    try {
+        const visitors = await Visitor.find().sort({ timestamp: -1 }).limit(20);
+        res.status(200).json({ success: true, visitors });
+    } catch (error) {
+        res.status(500).json({ success: false, message: 'Failed to fetch visitors' });
     }
 });
 
