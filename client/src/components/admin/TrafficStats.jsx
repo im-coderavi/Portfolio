@@ -86,24 +86,30 @@ const TrafficStats = () => {
             <div className="bg-white/5 border border-white/10 p-6 rounded-2xl">
                 <h3 className="text-xl font-bold text-white mb-6">Traffic Overview (Last 7 Days)</h3>
                 <div className="h-64 w-full">
-                    <ResponsiveContainer width="100%" height="100%">
-                        <BarChart data={stats?.chartData || []}>
-                            <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" vertical={false} />
-                            <XAxis
-                                dataKey="_id"
-                                stroke="#9CA3AF"
-                                tick={{ fill: '#9CA3AF' }}
-                                tickFormatter={(value) => new Date(value).toLocaleDateString(undefined, { weekday: 'short' })}
-                            />
-                            <YAxis stroke="#9CA3AF" tick={{ fill: '#9CA3AF' }} />
-                            <Tooltip
-                                contentStyle={{ backgroundColor: '#1F2937', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px' }}
-                                itemStyle={{ color: '#F3F4F6' }}
-                                labelStyle={{ color: '#9CA3AF', marginBottom: '4px' }}
-                            />
-                            <Bar dataKey="count" fill="#22d3ee" radius={[4, 4, 0, 0]} barSize={40} />
-                        </BarChart>
-                    </ResponsiveContainer>
+                    {stats?.chartData && stats.chartData.length > 0 ? (
+                        <ResponsiveContainer width="100%" height="100%">
+                            <BarChart data={stats.chartData}>
+                                <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" vertical={false} />
+                                <XAxis
+                                    dataKey="_id"
+                                    stroke="#9CA3AF"
+                                    tick={{ fill: '#9CA3AF' }}
+                                    tickFormatter={(value) => new Date(value).toLocaleDateString(undefined, { weekday: 'short' })}
+                                />
+                                <YAxis stroke="#9CA3AF" tick={{ fill: '#9CA3AF' }} />
+                                <Tooltip
+                                    contentStyle={{ backgroundColor: '#1F2937', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px' }}
+                                    itemStyle={{ color: '#F3F4F6' }}
+                                    labelStyle={{ color: '#9CA3AF', marginBottom: '4px' }}
+                                />
+                                <Bar dataKey="count" fill="#22d3ee" radius={[4, 4, 0, 0]} barSize={40} />
+                            </BarChart>
+                        </ResponsiveContainer>
+                    ) : (
+                        <div className="h-full w-full flex items-center justify-center text-text-secondary">
+                            No traffic data available to display
+                        </div>
+                    )}
                 </div>
             </div>
 
