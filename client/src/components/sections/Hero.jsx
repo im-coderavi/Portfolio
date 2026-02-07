@@ -8,16 +8,13 @@ import FadeIn from '../animations/FadeIn';
 
 const Hero = () => {
     const handleDownloadCV = () => {
-        const link = document.createElement('a');
-        link.href = '/Avishek_Giri_CV.pdf';
-        link.download = 'Avishek_Giri_CV.pdf';
-        link.click();
+        window.open('https://drive.google.com/file/d/1n6ldWkBO1U5yGBveH30EqiRajkorXa2w/view?usp=drive_link', '_blank');
     };
 
     const socialLinks = [
-        { icon: Linkedin, url: 'https://linkedin.com/in/avishekgiri', label: 'LinkedIn' },
-        { icon: Github, url: 'https://github.com/avishekgiri', label: 'GitHub' },
-        { icon: Globe, url: 'https://avishekgiri.dev', label: 'Portfolio' },
+        { icon: Linkedin, url: 'https://www.linkedin.com/in/im-coderavi/', label: 'LinkedIn' },
+        { icon: Github, url: 'https://github.com/im-coderavi', label: 'GitHub' },
+        { icon: Globe, url: 'https://www.coderavi.in/', label: 'Portfolio' },
     ];
 
     return (

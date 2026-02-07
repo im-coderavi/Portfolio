@@ -10,7 +10,7 @@ const Footer = () => {
     const socialLinks = [
         { icon: Linkedin, url: 'https://www.linkedin.com/in/im-coderavi/', label: 'LinkedIn' },
         { icon: Github, url: 'https://github.com/im-coderavi', label: 'GitHub' },
-        { icon: Globe, url: 'https://coderavi.in', label: 'Portfolio' },
+        { icon: Globe, url: 'https://www.coderavi.in/', label: 'Portfolio' },
         { icon: Mail, url: 'mailto:avishekgiri31@gmail.com', label: 'Email' },
     ];
 

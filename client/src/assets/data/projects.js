@@ -13,7 +13,7 @@ export const projectsData = [
         ],
         image: "/assets/projects/thumblify.png",
         liveDemo: "https://thumblify-demo.com",
-        repository: "https://github.com/avishekgiri/thumblify",
+        repository: "https://github.com/im-coderavi/thumblify",
         year: "2025-2026",
         category: "Gen AI"
     },
@@ -31,7 +31,7 @@ export const projectsData = [
         ],
         image: "/assets/projects/ats-builder.png",
         liveDemo: "https://ats-builder-demo.com",
-        repository: "https://github.com/avishekgiri/ats-builder",
+        repository: "https://github.com/im-coderavi/ats-builder",
         year: "2025-2026",
         category: "Gen AI"
     },
