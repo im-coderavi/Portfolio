@@ -15,7 +15,6 @@ require('dotenv').config();
 const Project = require('./models/Project');
 const Settings = require('./models/Settings');
 const Experience = require('./models/Experience');
-const Visitor = require('./models/Visitor');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -250,57 +249,7 @@ app.post('/api/contact', async (req, res) => {
     }
 });
 
-// Visitor tracking endpoint
-app.post('/api/visitor', async (req, res) => {
-    const { timestamp, userAgent, referrer, language } = req.body;
 
-    try {
-        // Save to database
-        const newVisitor = new Visitor({
-            timestamp: timestamp || new Date(),
-            userAgent,
-            referrer,
-            language
-        });
-        await newVisitor.save();
-
-        // Check if notifications are enabled
-        const settings = await Settings.findOne();
-        if (settings && !settings.notificationsEnabled) {
-            return res.status(200).json({ success: true, message: 'Visitor tracked (notifications disabled)' });
-        }
-
-        const visitorMailOptions = {
-            from: process.env.EMAIL_USER,
-            to: process.env.RECIPIENT_EMAIL,
-            subject: `👀 New Visitor on Your Portfolio Website`,
-            html: `
-          <!DOCTYPE html>
-          <html>
-          <body style="font-family: sans-serif; background-color: #f5f7fa; padding: 20px;">
-            <div style="max-width: 600px; margin: 0 auto; background: white; border-radius: 10px; padding: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
-                <h2 style="color: #7C3AED; text-align: center;">👀 New Website Visitor</h2>
-                <div style="background: #f0fdf4; padding: 15px; border-radius: 8px; margin-top: 20px;">
-                    <p><strong>🕒 Time:</strong> ${new Date(timestamp).toLocaleString('en-IN', { timeZone: 'Asia/Kolkata', dateStyle: 'full', timeStyle: 'medium' })}</p>
-                    <p><strong>💻 Browser:</strong> ${userAgent || 'Unknown'}</p>
-                    <p><strong>🔗 Referrer:</strong> ${referrer || 'Direct visit'}</p>
-                    <p><strong>🌐 Language:</strong> ${language || 'Unknown'}</p>
-                    <p style="font-size: 12px; color: #888; margin-top: 10px;">To disable these emails, visit your Admin Panel.</p>
-                </div>
-            </div>
-          </body>
-          </html>
-        `
-        };
-
-        await transporter.sendMail(visitorMailOptions);
-        console.log(`✅ Visitor notification sent at ${new Date(timestamp).toLocaleString()}`);
-        res.status(200).json({ success: true, message: 'Visitor tracked successfully' });
-    } catch (error) {
-        console.error('❌ Error processing visitor:', error);
-        res.status(200).json({ success: false, message: 'Visitor tracked (error occurred)' });
-    }
-});
 
 // ==================== ADMIN ENDPOINTS ====================
 
@@ -361,61 +310,7 @@ app.post('/api/admin/settings', verifyToken, async (req, res) => {
     }
 });
 
-// Get Traffic Stats (Protected)
-app.get('/api/admin/stats', verifyToken, async (req, res) => {
-    try {
-        const totalVisitors = await Visitor.countDocuments();
 
-        // Get visits for specific time ranges
-        const now = new Date();
-        const startOfDay = new Date(now.setHours(0, 0, 0, 0));
-        const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
-
-        const todayVisitors = await Visitor.countDocuments({ timestamp: { $gte: startOfDay } });
-        const monthVisitors = await Visitor.countDocuments({ timestamp: { $gte: startOfMonth } });
-
-        // Get daily visits for the last 7 days for chart
-        const sevenDaysAgo = new Date();
-        sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 6);
-        sevenDaysAgo.setHours(0, 0, 0, 0);
-
-        const dailyStats = await Visitor.aggregate([
-            {
-                $match: { timestamp: { $gte: sevenDaysAgo } }
-            },
-            {
-                $group: {
-                    _id: { $dateToString: { format: "%Y-%m-%d", date: "$timestamp" } },
-                    count: { $sum: 1 }
-                }
-            },
-            { $sort: { _id: 1 } }
-        ]);
-
-        res.status(200).json({
-            success: true,
-            stats: {
-                total: totalVisitors,
-                today: todayVisitors,
-                month: monthVisitors,
-                chartData: dailyStats
-            }
-        });
-    } catch (error) {
-        console.error('Error fetching stats:', error);
-        res.status(500).json({ success: false, message: 'Failed to fetch stats' });
-    }
-});
-
-// Get Recent Visitors (Protected)
-app.get('/api/admin/visitors', verifyToken, async (req, res) => {
-    try {
-        const visitors = await Visitor.find().sort({ timestamp: -1 }).limit(20);
-        res.status(200).json({ success: true, visitors });
-    } catch (error) {
-        res.status(500).json({ success: false, message: 'Failed to fetch visitors' });
-    }
-});
 
 // Get all projects (public)
 app.get('/api/projects', async (req, res) => {
