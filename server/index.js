@@ -118,46 +118,91 @@ if (fs.existsSync(uploadDir)) {
 
 // MongoDB Connection with caching for serverless
 let cachedDb = null;
+let connectionPromise = null;
 
 async function connectToDatabase(retries = 3) {
+    // If already connected, return immediately
     if (cachedDb && mongoose.connection.readyState === 1) {
         console.log('✅ Using cached MongoDB connection');
         return cachedDb;
     }
 
-    let lastError;
-    for (let attempt = 1; attempt <= retries; attempt++) {
-        try {
-            console.log(`🔄 MongoDB connection attempt ${attempt}/${retries}...`);
-
-            await mongoose.connect(process.env.MONGODB_URI, {
-                serverSelectionTimeoutMS: 30000, // 30 seconds for serverless cold start
-                socketTimeoutMS: 45000,
-                bufferCommands: false, // Disable buffering
-            });
-
-            // Set buffer timeout to prevent hanging operations
-            mongoose.set('bufferTimeoutMS', 30000);
-            console.log('✅ Connected to MongoDB Atlas');
-            cachedDb = mongoose.connection;
-            // Note: Settings will be initialized on first admin access
-            return cachedDb;
-        } catch (err) {
-            lastError = err;
-            console.error(`❌ MongoDB connection attempt ${attempt}/${retries} failed:`, err.message);
-
-            // If this isn't the last attempt, wait before retrying
-            if (attempt < retries) {
-                const waitTime = attempt * 1000; // Exponential backoff: 1s, 2s, 3s
-                console.log(`⏳ Waiting ${waitTime}ms before retry...`);
-                await new Promise(resolve => setTimeout(resolve, waitTime));
-            }
+    // If connection is in progress, wait for it
+    if (connectionPromise) {
+        console.log('⏳ Connection in progress, waiting...');
+        await connectionPromise;
+        if (mongoose.connection.readyState === 1) {
+            return mongoose.connection;
         }
     }
 
-    // All retries failed
-    console.error('❌ All MongoDB connection attempts failed');
-    throw lastError;
+    // Start new connection
+    connectionPromise = (async () => {
+        let lastError;
+        for (let attempt = 1; attempt <= retries; attempt++) {
+            try {
+                console.log(`🔄 MongoDB connection attempt ${attempt}/${retries}...`);
+
+                // Disconnect if in connecting state (stuck connection)
+                if (mongoose.connection.readyState === 2) {
+                    console.log('⚠️ Found stuck connection, disconnecting...');
+                    await mongoose.disconnect();
+                }
+
+                await mongoose.connect(process.env.MONGODB_URI, {
+                    serverSelectionTimeoutMS: 30000,
+                    socketTimeoutMS: 45000,
+                    bufferCommands: true, // Enable buffering to prevent race conditions
+                    maxPoolSize: 10,
+                    minPoolSize: 1,
+                });
+
+                // Wait for connection to be ready
+                if (mongoose.connection.readyState !== 1) {
+                    await new Promise((resolve, reject) => {
+                        const timeout = setTimeout(() => {
+                            reject(new Error('Connection timeout waiting for ready state'));
+                        }, 10000);
+
+                        mongoose.connection.once('connected', () => {
+                            clearTimeout(timeout);
+                            resolve();
+                        });
+
+                        mongoose.connection.once('error', (err) => {
+                            clearTimeout(timeout);
+                            reject(err);
+                        });
+                    });
+                }
+
+                console.log('✅ Connected to MongoDB Atlas');
+                cachedDb = mongoose.connection;
+                return cachedDb;
+            } catch (err) {
+                lastError = err;
+                console.error(`❌ MongoDB connection attempt ${attempt}/${retries} failed:`, err.message);
+
+                // If this isn't the last attempt, wait before retrying
+                if (attempt < retries) {
+                    const waitTime = attempt * 1000;
+                    console.log(`⏳ Waiting ${waitTime}ms before retry...`);
+                    await new Promise(resolve => setTimeout(resolve, waitTime));
+                }
+            }
+        }
+
+        // All retries failed
+        console.error('❌ All MongoDB connection attempts failed');
+        throw lastError;
+    })();
+
+    try {
+        const result = await connectionPromise;
+        return result;
+    } finally {
+        connectionPromise = null;
+    }
 }
 
 // Initialize connection
