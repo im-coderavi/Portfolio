@@ -1,210 +1,269 @@
-// Simple rule-based chatbot with plain text responses
+// Professional Personal AI Assistant Chatbot for Avishek Giri
+// Enhanced responses, sales bot functionality, and call scheduling
 
 const getKeywords = (message) => {
     return message.toLowerCase().trim();
 };
 
-const getBotResponse = (userMessage, projects = [], experiences = [], knowledgeBase = []) => {
+const getBotResponse = (userMessage, projects = [], experiences = []) => {
     const msg = getKeywords(userMessage);
 
-    // First, try to find answer in knowledge base
-    if (knowledgeBase.length > 0) {
-        const kbAnswer = searchKnowledgeBase(msg, knowledgeBase);
-        if (kbAnswer) {
-            return kbAnswer;
-        }
+    // ==================== GREETINGS ====================
+    if (msg.match(/\b(hi|hello|hey|hola|namaste|good morning|good afternoon|good evening)\b/)) {
+        return `Hello! 👋 Welcome to Avishek Giri's Portfolio!
+
+I'm his personal AI assistant, here to help you learn about:
+✨ His skills & expertise
+💼 Professional experience
+🚀 Projects he's built
+🤝 How to work with him
+
+What would you like to know? Feel free to ask anything!`;
     }
 
-    // Greetings
-    if (msg.match(/\b(hi|hello|hey|hola|namaste)\b/)) {
-        return "Hi there! 👋 I'm Avishek's AI assistant. I can help you learn about his skills, experience, and projects. What would you like to know?";
+    // ==================== ABOUT AVISHEK ====================
+    if (msg.match(/\b(who|about|tell me|introduce|know|background)\b/) && msg.match(/\b(avishek|you|yourself|him|he)\b/)) {
+        return `**Avishek Giri** is a passionate Full Stack MERN Developer with 2+ years of hands-on experience in building modern, scalable web applications.
+
+🎯 **What He Does:**
+• Builds end-to-end web applications using MERN Stack
+• Creates responsive, user-friendly interfaces
+• Develops robust backend APIs & databases
+• Integrates AI features into applications
+
+💡 **His Approach:**
+He believes in clean code, best practices, and delivering solutions that make a real impact for clients.
+
+📊 **Portfolio Stats:**
+• ${experiences.length}+ Professional Roles
+• ${projects.length}+ Completed Projects
+• Multiple satisfied clients
+
+Would you like to discuss a project? Click the **"💼 Interested in Working Together?"** button below!`;
     }
 
-    // About Avishek
-    if (msg.match(/\b(who|about|tell me|introduce)\b/) && msg.match(/\b(avishek|you|yourself)\b/)) {
-        return `Avishek Giri is a Full Stack MERN Developer with 2+ years of experience. He specializes in:
+    // ==================== SKILLS & TECH STACK ====================
+    if (msg.match(/\b(skill|technology|tech|stack|expertise|know|tools|programming|languages|framework)\b/)) {
+        return `**Avishek's Technical Expertise:**
 
-🚀 Skills:
-- Frontend: React.js, JavaScript, HTML5, CSS3
-- Backend: Node.js, Express.js, RESTful APIs
-- Database: MongoDB, Mongoose
-- Tools: Git, Vercel, Cloudinary
-- Special: AI Integration, Responsive Design
+🎨 **Frontend Development:**
+• React.js - Dynamic, component-based UIs
+• JavaScript (ES6+) - Modern JS features
+• HTML5 & CSS3 - Semantic, accessible markup
+• Responsive Design - Mobile-first approach
 
-💼 Experience: ${experiences.length} professional roles
-📁 Projects: ${projects.length} completed projects
+⚙️ **Backend Development:**
+• Node.js & Express.js - Scalable server-side apps
+• RESTful API Design - Clean, efficient endpoints
+• Authentication (JWT) - Secure user management
 
-Would you like to know more about his projects or experience?`;
+🗄️ **Database:**
+• MongoDB & Mongoose - NoSQL database solutions
+• Database Architecture - Efficient data modeling
+
+🛠️ **Tools & Platforms:**
+• Git & GitHub - Version control
+• Vercel - Deployment & hosting
+• Cloudinary - Media management
+• AI Integration - Smart features
+
+**Ready to leverage these skills for your project?** Let me know what you're building!`;
     }
 
-    // Skills
-    if (msg.match(/\b(skill|technology|tech stack|expertise|know)\b/)) {
-        return `Avishek is proficient in:
-
-Frontend:
-✅ React.js - Building dynamic UIs
-✅ JavaScript (ES6+)
-✅ HTML5 & CSS3
-✅ Responsive Design
-
-Backend:
-✅ Node.js & Express.js
-✅ RESTful API Development
-✅ Authentication (JWT)
-
-Database:
-✅ MongoDB & Mongoose
-✅ Database Design
-
-Tools & Others:
-✅ Git & GitHub
-✅ Vercel Deployment
-✅ Cloudinary Integration
-✅ AI Integration
-
-Want to see his projects or discuss a collaboration?`;
-    }
-
-    // Projects
-    if (msg.match(/\b(project|portfolio|work|built|created)\b/)) {
+    // ==================== PROJECTS ====================
+    if (msg.match(/\b(project|portfolio|work|built|created|showcase|examples)\b/) && !msg.match(/\b(work together|work with|hire)\b/)) {
         if (projects.length > 0) {
-            const projectList = projects.slice(0, 3).map((p, i) =>
-                `${i + 1}. ${p.title} - ${p.description?.substring(0, 80)}...`
-            ).join('\n');
+            const projectList = projects.slice(0, 4).map((p, i) =>
+                `**${i + 1}. ${p.title}**\n   ${p.description?.substring(0, 100)}...`
+            ).join('\n\n');
 
-            return `Avishek has worked on ${projects.length} projects! Here are some highlights:
+            return `**Avishek's Featured Projects:**
 
 ${projectList}
 
-You can explore all projects in the Projects section below. Interested in working together? Let me know!`;
+📂 Check out the **Projects section** below to explore all ${projects.length} projects with live demos!
+
+**Interested in something similar?** Let's discuss your project idea!`;
         }
-        return "Avishek has worked on multiple MERN stack projects. Check out the Projects section on this website to see his work!";
+        return `Avishek has built multiple full-stack MERN applications. Check out the **Projects section** on this website to see his work!
+
+**Want something built for you?** Click the **"💼 Interested in Working Together?"** button!`;
     }
 
-    // Experience
-    if (msg.match(/\b(experience|job|work|career|professional)\b/)) {
+    // ==================== EXPERIENCE ====================
+    if (msg.match(/\b(experience|job|career|professional|worked|company|role|position)\b/) && !msg.match(/\b(work together|work with)\b/)) {
         if (experiences.length > 0) {
             const expList = experiences.map((e, i) =>
-                `${i + 1}. ${e.position} at ${e.company} ${e.current ? '(Current)' : ''}`
-            ).join('\n');
+                `**${e.position}** at ${e.company} ${e.current ? '*(Current)*' : ''}`
+            ).join('\n• ');
 
-            return `Avishek has ${experiences.length}+ years of professional experience:
+            return `**Avishek's Professional Experience:**
 
-${expList}
+• ${expList}
 
-He's passionate about building scalable web applications and solving complex problems. Want to discuss a project?`;
+📈 **${experiences.length}+ years** of building production-ready applications, solving complex problems, and delivering quality solutions.
+
+**Want to add him to your team?** Let's connect!`;
         }
-        return "Avishek has 2+ years of professional experience as a Full Stack MERN Developer. Check the Experience section for details!";
+        return `Avishek has **2+ years** of professional experience as a Full Stack MERN Developer. Check the **Experience section** for details!`;
     }
 
-    // Contact / Hire
-    if (msg.match(/\b(contact|email|reach|hire|work together|collaborate|project)\b/)) {
-        return `Great! I'd love to help you connect with Avishek.
+    // ==================== SALES BOT: PROJECT/HIRE INTENT ====================
+    if (msg.match(/\b(hire|work together|work with|collaborate|project for|need a developer|looking for|developer|build|create|want to make|need help|freelance|contract)\b/)) {
+        return `That's great! 🎉 Avishek would love to help with your project!
 
+**Here's how to get started:**
+
+1️⃣ **Fill the form** - Click **"💼 Interested in Working Together?"** button below
+2️⃣ **Share details** - Tell us about your project, budget, and timeline
+3️⃣ **Get a proposal** - Avishek will review and respond within 24-48 hours
+
+📧 **Quick Contact:**
+• Email: avishekgiri31@gmail.com
+• LinkedIn: https://www.linkedin.com/in/im-coderavi/
+
+**Don't hesitate** - fill out the form below and let's make your project happen! 🚀`;
+    }
+
+    // ==================== CALL SCHEDULING ====================
+    if (msg.match(/\b(call|schedule|meeting|discuss|talk|phone|video call|consultation|book)\b/)) {
+        return `📞 **Want to schedule a call with Avishek?**
+
+**Options to connect:**
+
+1️⃣ **Email First** (Recommended)
+   Send your availability to: **avishekgiri31@gmail.com**
+   Include your timezone and preferred time slots.
+
+2️⃣ **LinkedIn Message**
+   Connect on LinkedIn: https://www.linkedin.com/in/im-coderavi/
+   Send a direct message with your request.
+
+3️⃣ **Fill the Contact Form**
+   Use the **"💼 Interested in Working Together?"** button
+   Mention "Schedule a Call" in your message.
+
+**Avishek typically responds within 24-48 hours!**
+
+What would you like to discuss in the call?`;
+    }
+
+    // ==================== PRICING / COST ====================
+    if (msg.match(/\b(price|cost|rate|charge|budget|fee|quote|estimate|how much)\b/)) {
+        return `💰 **Pricing Information**
+
+Avishek's pricing depends on:
+• Project scope & complexity
+• Timeline requirements
+• Features & integrations needed
+
+**To get an accurate quote:**
+
+1️⃣ Click **"💼 Interested in Working Together?"** below
+2️⃣ Describe your project requirements
+3️⃣ Include your budget range & timeline
+4️⃣ Avishek will review and send a detailed proposal
+
+**Typical Project Types:**
+• Landing Pages & Portfolios
+• Full-stack Web Applications
+• API Development & Integration
+• Custom Dashboard Solutions
+
+**Ready to get started?** Fill out the form below! 📝`;
+    }
+
+    // ==================== CONTACT INFORMATION ====================
+    if (msg.match(/\b(contact|email|reach|connect|get in touch|message|how can i)\b/) && !msg.match(/\b(hire|project|work)\b/)) {
+        return `📬 **Contact Avishek:**
+
+📧 **Email:** avishekgiri31@gmail.com
+🔗 **LinkedIn:** https://www.linkedin.com/in/im-coderavi/
+🌐 **Portfolio:** https://www.coderavi.in/
+
+**For Project Inquiries:**
+Use the **"💼 Interested in Working Together?"** button below to share your project details!
+
+**Response Time:** Usually within 24-48 hours ⏰`;
+    }
+
+    // ==================== AVAILABILITY ====================
+    if (msg.match(/\b(available|free|busy|time|when|freelance|open)\b/)) {
+        const isCurrentlyWorking = experiences.some(e => e.current);
+        return `📅 **Avishek's Availability**
+
+${isCurrentlyWorking ? "Currently working professionally but **open to freelance projects!**" : "Currently **available** for new opportunities!"}
+
+**For New Projects:**
+• Freelance work ✅
+• Contract projects ✅
+• Consultation calls ✅
+
+**Response Time:** 24-48 hours
+
+**Interested?** Click **"💼 Interested in Working Together?"** and let's discuss your timeline!`;
+    }
+
+    // ==================== MERN / TECH SPECIFIC ====================
+    if (msg.match(/\b(mern|react|node|mongodb|express|javascript|frontend|backend|fullstack|full stack|api)\b/)) {
+        return `🔷 **Yes! Avishek specializes in the MERN Stack:**
+
+• **M**ongoDB - NoSQL database
+• **E**xpress.js - Backend framework  
+• **R**eact.js - Frontend library
+• **N**ode.js - Runtime environment
+
+**Additional Expertise:**
+• REST API Development
+• JWT Authentication
+• Cloudinary Integration
+• Vercel Deployment
+• AI Feature Integration
+
+This stack is perfect for building modern, scalable web applications! 🚀
+
+**Have a MERN project in mind?** Let's discuss it!`;
+    }
+
+    // ==================== THANK YOU ====================
+    if (msg.match(/\b(thank|thanks|appreciate|helpful|great|awesome|nice)\b/)) {
+        return `You're welcome! 😊
+
+Feel free to:
+• Ask more questions about Avishek
+• Explore the portfolio sections below
+• Click **"💼 Interested in Working Together?"** for project inquiries
+
+I'm here to help! Have a great day! 🌟`;
+    }
+
+    // ==================== GOODBYE ====================
+    if (msg.match(/\b(bye|goodbye|see you|later|take care)\b/)) {
+        return `Goodbye! 👋
+
+Before you go, remember:
 📧 Email: avishekgiri31@gmail.com
-📝 Contact Form: Available on this website
+🔗 LinkedIn: https://www.linkedin.com/in/im-coderavi/
 
-Want to discuss a project?
-Click the "💼 Interested in Working Together?" button below to share your details, and Avishek will reach out to you soon!
-
-What kind of project are you thinking about?`;
+Feel free to come back anytime! Have a wonderful day! 🌟`;
     }
 
-    // Pricing / Cost
-    if (msg.match(/\b(price|cost|rate|charge|budget|fee)\b/)) {
-        return `Pricing depends on the project scope and requirements.
+    // ==================== DEFAULT RESPONSE ====================
+    return `I'm here to help! 😊
 
-To get an accurate quote:
-1. Click "💼 Interested in Working Together?" below
-2. Share your project details
-3. Avishek will review and get back to you with a proposal
+**Ask me about:**
 
-Every project is unique, so let's discuss your specific needs!`;
-    }
+💡 **Skills & Expertise** - "What are Avishek's skills?"
+📁 **Projects** - "Show me his projects"
+💼 **Experience** - "Tell me about his experience"
+📧 **Contact** - "How can I reach him?"
+🤝 **Collaboration** - "I want to hire Avishek"
+📞 **Schedule a Call** - "Can I schedule a call?"
+💰 **Pricing** - "What are his rates?"
 
-    // Availability
-    if (msg.match(/\b(available|free|busy|time|when)\b/)) {
-        return `Avishek is currently ${experiences.some(e => e.current) ? 'working professionally' : 'available'} and open to new opportunities!
-
-For project inquiries:
-- Click "💼 Interested in Working Together?" below
-- Share your timeline and requirements
-- He'll respond within 24-48 hours
-
-What's your project timeline?`;
-    }
-
-    // Technologies / Stack
-    if (msg.match(/\b(mern|react|node|mongodb|express|stack)\b/)) {
-        return `Yes! Avishek specializes in the MERN Stack:
-
-🔷 MongoDB - NoSQL database
-🔷 Express.js - Backend framework
-🔷 React.js - Frontend library
-🔷 Node.js - Runtime environment
-
-He's also experienced with:
-- Cloudinary (file storage)
-- Vercel (deployment)
-- JWT Authentication
-- RESTful APIs
-- AI Integration
-
-Perfect for building modern, scalable web applications! 🚀`;
-    }
-
-    // Thank you
-    if (msg.match(/\b(thank|thanks|appreciate)\b/)) {
-        return "You're welcome! 😊 Feel free to ask anything else about Avishek's work, or use the contact form to reach out directly. Happy to help!";
-    }
-
-    // Default response
-    return `I'm here to help! You can ask me about:
-
-💡 Avishek's skills and expertise
-📁 His projects and portfolio
-💼 Work experience
-📧 How to contact him
-🤝 Collaboration opportunities
-
-Or click "💼 Interested in Working Together?" to discuss your project directly!
+**Or click "💼 Interested in Working Together?"** to discuss your project directly!
 
 What would you like to know?`;
-};
-
-// Search knowledge base for relevant answer
-const searchKnowledgeBase = (query, knowledgeBase) => {
-    const keywords = query.split(' ').filter(word => word.length > 3);
-
-    for (const kb of knowledgeBase) {
-        const content = kb.content.toLowerCase();
-        const matchCount = keywords.filter(kw => content.includes(kw)).length;
-
-        // If at least 2 keywords match, extract relevant chunk
-        if (matchCount >= 2) {
-            return extractRelevantChunk(kb.content, keywords);
-        }
-    }
-
-    return null;
-};
-
-// Extract relevant chunk from knowledge base content
-const extractRelevantChunk = (content, keywords) => {
-    const sentences = content.split(/[.!?]+/).filter(s => s.trim().length > 0);
-
-    // Find sentences containing keywords
-    const relevantSentences = sentences.filter(sentence => {
-        const lowerSentence = sentence.toLowerCase();
-        return keywords.some(kw => lowerSentence.includes(kw));
-    });
-
-    if (relevantSentences.length > 0) {
-        // Return first 3 relevant sentences as a chunk
-        return relevantSentences.slice(0, 3).join('. ') + '.';
-    }
-
-    return null;
 };
 
 module.exports = {

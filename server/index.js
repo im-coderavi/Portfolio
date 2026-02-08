@@ -18,7 +18,6 @@ const Project = require('./models/Project');
 const Settings = require('./models/Settings');
 const Experience = require('./models/Experience');
 const ChatConversation = require('./models/ChatConversation');
-const KnowledgeBase = require('./models/KnowledgeBase');
 const Deal = require('./models/Deal');
 
 // Import Chatbot Logic (Rule-based - No external API needed!)
@@ -95,7 +94,7 @@ const corsOptions = {
 // Add explicit CORS headers to all responses
 app.use((req, res, next) => {
     res.header('Access-Control-Allow-Origin', '*');
-    res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+    res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, PATCH, DELETE, OPTIONS');
     res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization, X-Admin-Password');
 
     // Handle preflight requests
@@ -749,11 +748,8 @@ app.post('/api/chat/message', async (req, res) => {
         const projects = await Project.find().select('title description technologies');
         const experiences = await Experience.find().select('company position current');
 
-        // Get knowledge base for intelligent responses
-        const knowledgeBase = await KnowledgeBase.find().select('title content');
-
-        // Get bot response using rule-based system with knowledge base
-        const botReply = getBotResponse(message, projects, experiences, knowledgeBase);
+        // Get bot response using rule-based system
+        const botReply = getBotResponse(message, projects, experiences);
 
         console.log(`🤖 [/api/chat/message] Bot reply: ${botReply.substring(0, 50)}...`);
 
@@ -985,107 +981,6 @@ app.delete('/api/admin/chat/conversations/:sessionId', verifyToken, async (req, 
     }
 });
 
-// ============================================
-// KNOWLEDGE BASE MANAGEMENT ENDPOINTS
-// ============================================
-
-// Upload PDF to knowledge base (Admin only)
-app.post('/api/admin/knowledge-base/upload', verifyToken, pdfUpload.single('pdf'), async (req, res) => {
-    try {
-        const { title } = req.body;
-
-        if (!req.file) {
-            return res.status(400).json({ success: false, message: 'PDF file is required' });
-        }
-
-        if (!title) {
-            return res.status(400).json({ success: false, message: 'Title is required' });
-        }
-
-        console.log('📄 [/api/admin/knowledge-base/upload] Uploading PDF:', title);
-
-        // Download PDF from Cloudinary to extract text
-        const response = await axios.get(req.file.path, { responseType: 'arraybuffer' });
-        const buffer = response.data;
-
-        // Extract text from PDF
-        const pdfData = await pdfParse(buffer);
-        const extractedText = pdfData.text;
-
-        console.log(`📄 Extracted ${extractedText.length} characters from PDF`);
-
-        // Save to database
-        const knowledgeBase = new KnowledgeBase({
-            title,
-            filename: req.file.filename,
-            content: extractedText,
-            fileUrl: req.file.path,
-            uploadedBy: 'admin'
-        });
-
-        await knowledgeBase.save();
-
-        res.status(201).json({
-            success: true,
-            message: 'PDF uploaded and processed successfully',
-            knowledgeBase: {
-                id: knowledgeBase._id,
-                title: knowledgeBase.title,
-                filename: knowledgeBase.filename,
-                contentLength: extractedText.length
-            }
-        });
-    } catch (error) {
-        console.error('❌ [/api/admin/knowledge-base/upload] Error:', error);
-        res.status(500).json({ success: false, message: 'Failed to upload PDF', error: error.message });
-    }
-});
-
-// Get all knowledge base items (Admin only)
-app.get('/api/admin/knowledge-base', verifyToken, async (req, res) => {
-    try {
-        const knowledgeBase = await KnowledgeBase.find()
-            .select('-content') // Exclude large content field
-            .sort({ createdAt: -1 });
-
-        res.status(200).json({
-            success: true,
-            count: knowledgeBase.length,
-            knowledgeBase
-        });
-    } catch (error) {
-        console.error('❌ [/api/admin/knowledge-base] Error:', error);
-        res.status(500).json({ success: false, message: 'Failed to fetch knowledge base' });
-    }
-});
-
-// Delete knowledge base item (Admin only)
-app.delete('/api/admin/knowledge-base/:id', verifyToken, async (req, res) => {
-    try {
-        const { id } = req.params;
-
-        const kb = await KnowledgeBase.findById(id);
-
-        if (!kb) {
-            return res.status(404).json({ success: false, message: 'Knowledge base item not found' });
-        }
-
-        // Delete from Cloudinary
-        const publicId = kb.fileUrl.split('/').slice(-2).join('/').split('.')[0];
-        await cloudinary.uploader.destroy(publicId, { resource_type: 'raw' });
-
-        // Delete from database
-        await KnowledgeBase.findByIdAndDelete(id);
-
-        res.status(200).json({
-            success: true,
-            message: 'Knowledge base item deleted successfully'
-        });
-    } catch (error) {
-        console.error('❌ [/api/admin/knowledge-base/:id] Error:', error);
-        res.status(500).json({ success: false, message: 'Failed to delete knowledge base item' });
-    }
-});
 
 // ============================================
 // DEAL MANAGEMENT ENDPOINTS
@@ -1096,18 +991,23 @@ app.post('/api/chat/create-deal', async (req, res) => {
     try {
         const { sessionId, userInfo, projectDetails, budget, timeline } = req.body;
 
-        if (!sessionId || !userInfo || !projectDetails) {
+        if (!sessionId || !userInfo) {
             return res.status(400).json({
                 success: false,
-                message: 'Session ID, user info, and project details are required'
+                message: 'Session ID and user info are required'
             });
         }
 
-        // Find conversation
-        const conversation = await ChatConversation.findOne({ sessionId });
+        // Find or create conversation
+        let conversation = await ChatConversation.findOne({ sessionId });
 
         if (!conversation) {
-            return res.status(404).json({ success: false, message: 'Conversation not found' });
+            // Create a new conversation for this session
+            conversation = new ChatConversation({
+                sessionId,
+                messages: []
+            });
+            await conversation.save();
         }
 
         // Create deal
@@ -1280,29 +1180,36 @@ app.patch('/api/admin/deals/:id', verifyToken, async (req, res) => {
         const { id } = req.params;
         const { status, notes } = req.body;
 
-        const deal = await Deal.findByIdAndUpdate(
-            id,
-            { status, notes, ...(status === 'closed' && { closedAt: new Date() }) },
-            { new: true }
-        );
+        console.log(`📝 [/api/admin/deals/${id}] Updating status to: ${status}`);
+
+        const updateData = {};
+        if (status) {
+            updateData.status = status;
+            if (status === 'closed') {
+                updateData.closedAt = new Date();
+            }
+        }
+        if (notes) {
+            updateData.notes = notes;
+        }
+
+        const deal = await Deal.findByIdAndUpdate(id, updateData, { new: true });
 
         if (!deal) {
+            console.log(`❌ [/api/admin/deals/${id}] Deal not found`);
             return res.status(404).json({ success: false, message: 'Deal not found' });
         }
 
-        // Update conversation
-        await ChatConversation.findByIdAndUpdate(deal.conversationId, {
-            dealStatus: status
-        });
+        console.log(`✅ [/api/admin/deals/${id}] Status updated successfully`);
 
         res.status(200).json({
             success: true,
-            message: 'Deal updated successfully',
+            message: 'Deal status updated successfully',
             deal
         });
     } catch (error) {
-        console.error('❌ [/api/admin/deals/:id] Error:', error);
-        res.status(500).json({ success: false, message: 'Failed to update deal' });
+        console.error('❌ [/api/admin/deals/:id] Error:', error.message);
+        res.status(500).json({ success: false, message: 'Failed to update deal: ' + error.message });
     }
 });
 

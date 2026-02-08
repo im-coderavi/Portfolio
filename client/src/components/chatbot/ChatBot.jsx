@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { MessageCircle, X, Send, Loader2, Sparkles, User, Bot } from 'lucide-react';
+import { MessageCircle, X, Send, Loader2, Sparkles, User, Bot, Trash2 } from 'lucide-react';
 import axios from 'axios';
 import API_URL from '../../config/api';
 
@@ -19,6 +19,22 @@ const ChatBot = () => {
         timeline: ''
     });
     const messagesEndRef = useRef(null);
+
+    // Format message with basic markdown support
+    const formatMessage = (content) => {
+        if (!content) return '';
+
+        // Convert **bold** to <strong>
+        let formatted = content.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+
+        // Convert *italic* to <em> (single asterisk)
+        formatted = formatted.replace(/(?<!\*)\*([^*]+)\*(?!\*)/g, '<em>$1</em>');
+
+        // Convert bullet points (• or -) at start of line
+        formatted = formatted.replace(/^[•\-]\s+/gm, '• ');
+
+        return formatted;
+    };
 
     // Generate or retrieve session ID
     useEffect(() => {
@@ -117,7 +133,7 @@ const ChatBot = () => {
             const response = await axios.post(`${API_URL}/api/chat/create-deal`, {
                 sessionId,
                 userInfo,
-                projectDetails: messages.filter(m => m.role === 'user').map(m => m.content).join('\n'),
+                projectDetails: messages.filter(m => m.role === 'user').map(m => m.content).join('\n') || 'New project inquiry',
                 budget: userInfo.budget,
                 timeline: userInfo.timeline
             });
@@ -136,6 +152,27 @@ const ChatBot = () => {
         } catch (error) {
             console.error('Failed to create deal:', error);
             alert('Failed to submit inquiry. Please try again.');
+        }
+    };
+
+    // Clear chat history
+    const clearChat = () => {
+        if (window.confirm('Are you sure you want to clear the chat?')) {
+            // Generate new session ID
+            const newSid = `session_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+            localStorage.setItem('chatSessionId', newSid);
+            setSessionId(newSid);
+
+            // Reset messages to welcome message
+            setMessages([{
+                role: 'assistant',
+                content: 'Hi! I\'m Avishek\'s AI assistant. Feel free to ask me anything about his skills, experience, or projects. How can I help you today?',
+                timestamp: new Date()
+            }]);
+
+            // Reset form
+            setShowConfirmForm(false);
+            setUserInfo({ name: '', email: '', phone: '', budget: '', timeline: '' });
         }
     };
 
@@ -179,12 +216,21 @@ const ChatBot = () => {
                                     <p className="text-xs text-white/80">Ask me about Avishek</p>
                                 </div>
                             </div>
-                            <button
-                                onClick={() => setIsOpen(false)}
-                                className="p-2 hover:bg-white/10 rounded-lg transition-colors"
-                            >
-                                <X className="text-white" size={20} />
-                            </button>
+                            <div className="flex items-center gap-2">
+                                <button
+                                    onClick={clearChat}
+                                    className="p-2 hover:bg-white/10 rounded-lg transition-colors"
+                                    title="Clear Chat"
+                                >
+                                    <Trash2 className="text-white" size={18} />
+                                </button>
+                                <button
+                                    onClick={() => setIsOpen(false)}
+                                    className="p-2 hover:bg-white/10 rounded-lg transition-colors"
+                                >
+                                    <X className="text-white" size={20} />
+                                </button>
+                            </div>
                         </div>
 
                         {/* Messages */}
@@ -207,7 +253,10 @@ const ChatBot = () => {
                                             : 'bg-white/5 text-text-primary border border-white/10'
                                             }`}
                                     >
-                                        <p className="text-sm whitespace-pre-wrap">{msg.content}</p>
+                                        <p
+                                            className="text-sm whitespace-pre-wrap"
+                                            dangerouslySetInnerHTML={{ __html: formatMessage(msg.content) }}
+                                        />
                                     </div>
                                     {msg.role === 'user' && (
                                         <div className="w-8 h-8 bg-white/10 rounded-full flex items-center justify-center flex-shrink-0">
