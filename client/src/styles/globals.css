@@ -149,25 +149,25 @@ html.light .hover\:bg-white\/10:hover {
   0% {
     background-position: 0% 50%;
   }
+
   50% {
     background-position: 100% 50%;
   }
+
   100% {
     background-position: 0% 50%;
   }
 }
 
 .logo-rgb-text {
-  background: linear-gradient(
-    -45deg,
-    #ff0000,
-    #ff7f00,
-    #ffff00,
-    #00ff00,
-    #0000ff,
-    #4b0082,
-    #8f00ff
-  );
+  background: linear-gradient(-45deg,
+      #ff0000,
+      #ff7f00,
+      #ffff00,
+      #00ff00,
+      #0000ff,
+      #4b0082,
+      #8f00ff);
   background-size: 300% 300%;
   -webkit-background-clip: text;
   background-clip: text;
@@ -176,4 +176,57 @@ html.light .hover\:bg-white\/10:hover {
   text-shadow: 0 0 20px rgba(255, 255, 255, 0.1);
   font-weight: 800;
   letter-spacing: -0.5px;
+}
+
+/* ====== MOBILE RESPONSIVENESS ====== */
+
+/* Safe Area Insets for iOS devices with notch */
+.pb-safe {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+.pt-safe {
+  padding-top: env(safe-area-inset-top);
+}
+
+/* Touch-friendly targets (min 44x44px for accessibility) */
+@media (max-width: 640px) {
+  .touch-target {
+    min-height: 44px;
+    min-width: 44px;
+  }
+
+  /* Larger tap areas on mobile */
+  button,
+  a {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  /* Prevent zoom on input focus (iOS) */
+  input,
+  textarea,
+  select {
+    font-size: 16px !important;
+  }
+
+  /* Skill icons smaller on mobile */
+  .skill-icon-container {
+    width: 3.5rem !important;
+    height: 3.5rem !important;
+  }
+
+  .skill-icon-container img {
+    width: 2.5rem !important;
+    height: 2.5rem !important;
+  }
+}
+
+/* Hide scrollbar on mobile chat */
+.hide-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
 }

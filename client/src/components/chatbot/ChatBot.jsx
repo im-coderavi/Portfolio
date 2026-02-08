@@ -188,9 +188,10 @@ const ChatBot = () => {
                         whileHover={{ scale: 1.1 }}
                         whileTap={{ scale: 0.9 }}
                         onClick={() => setIsOpen(true)}
-                        className="fixed bottom-6 right-6 z-50 p-4 bg-gradient-to-r from-accent-cyan to-accent-blue text-white rounded-full shadow-2xl hover:shadow-accent-cyan/50 transition-all"
+                        className="fixed z-50 p-4 bg-gradient-to-r from-accent-cyan to-accent-blue text-white rounded-full shadow-2xl hover:shadow-accent-cyan/50 transition-all bottom-6 right-6 sm:bottom-6 sm:right-6"
+                        style={{ paddingBottom: 'max(1rem, env(safe-area-inset-bottom))' }}
                     >
-                        <MessageCircle size={28} />
+                        <MessageCircle size={28} className="sm:w-7 sm:h-7 w-6 h-6" />
                         <span className="absolute -top-1 -right-1 w-3 h-3 bg-green-500 rounded-full animate-pulse"></span>
                     </motion.button>
                 )}
@@ -203,7 +204,10 @@ const ChatBot = () => {
                         initial={{ opacity: 0, y: 100, scale: 0.8 }}
                         animate={{ opacity: 1, y: 0, scale: 1 }}
                         exit={{ opacity: 0, y: 100, scale: 0.8 }}
-                        className="fixed bottom-6 right-6 z-50 w-[400px] h-[600px] max-w-[calc(100vw-2rem)] max-h-[calc(100vh-2rem)] bg-primary-dark border border-white/10 rounded-2xl shadow-2xl flex flex-col overflow-hidden"
+                        className="fixed z-50 bg-primary-dark border border-white/10 shadow-2xl flex flex-col overflow-hidden
+                            inset-0 w-full h-full rounded-none
+                            sm:bottom-6 sm:right-6 sm:left-auto sm:top-auto sm:w-[400px] sm:h-[600px] sm:max-w-[calc(100vw-2rem)] sm:max-h-[calc(100vh-2rem)] sm:rounded-2xl"
+                        style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
                     >
                         {/* Header */}
                         <div className="bg-gradient-to-r from-accent-cyan to-accent-blue p-4 flex items-center justify-between">

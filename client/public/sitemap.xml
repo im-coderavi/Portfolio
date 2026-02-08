@@ -7,33 +7,25 @@
   <!-- Homepage - Highest Priority -->
   <url>
     <loc>https://coderavi.in/</loc>
-    <lastmod>2026-02-08</lastmod>
+    <lastmod>2024-02-08</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
-  </url>
-
-  <!-- About Page -->
-  <url>
-    <loc>https://coderavi.in/about</loc>
-    <lastmod>2026-02-08</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
   </url>
 
   <!-- Privacy Policy - Required for AdSense -->
   <url>
     <loc>https://coderavi.in/privacy-policy</loc>
-    <lastmod>2026-02-08</lastmod>
+    <lastmod>2024-02-08</lastmod>
     <changefreq>yearly</changefreq>
-    <priority>0.6</priority>
+    <priority>0.7</priority>
   </url>
 
   <!-- Terms of Service - Required for AdSense -->
   <url>
     <loc>https://coderavi.in/terms-of-service</loc>
-    <lastmod>2026-02-08</lastmod>
+    <lastmod>2024-02-08</lastmod>
     <changefreq>yearly</changefreq>
-    <priority>0.6</priority>
+    <priority>0.7</priority>
   </url>
 
 </urlset>

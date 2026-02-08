@@ -33,7 +33,7 @@ const Skills = () => {
                             </FadeIn>
 
                             {/* Icons Only - Flex Layout */}
-                            <div className="flex flex-wrap justify-center items-center gap-8">
+                            <div className="flex flex-wrap justify-center items-center gap-4 sm:gap-8">
                                 {skills.map((skill, index) => (
                                     <FadeIn key={skill.name} direction="up" delay={0.03 * index}>
                                         <motion.div
@@ -45,11 +45,11 @@ const Skills = () => {
                                             title={skill.name}
                                         >
                                             {/* Icon Container */}
-                                            <div className="w-16 h-16 flex items-center justify-center bg-white/5 dark:bg-white/5 light:bg-gray-100 rounded-xl border border-white/10 dark:border-white/10 light:border-gray-300 group-hover:bg-white/10 dark:group-hover:bg-white/10 light:group-hover:bg-gray-200 group-hover:border-accent-cyan/50 transition-all duration-300 group-hover:shadow-lg group-hover:shadow-accent-cyan/20">
+                                            <div className="w-14 h-14 sm:w-16 sm:h-16 flex items-center justify-center bg-white/5 dark:bg-white/5 light:bg-gray-100 rounded-xl border border-white/10 dark:border-white/10 light:border-gray-300 group-hover:bg-white/10 dark:group-hover:bg-white/10 light:group-hover:bg-gray-200 group-hover:border-accent-cyan/50 transition-all duration-300 group-hover:shadow-lg group-hover:shadow-accent-cyan/20">
                                                 <img
                                                     src={skill.icon}
                                                     alt={skill.name}
-                                                    className="w-12 h-12 object-contain"
+                                                    className="w-10 h-10 sm:w-12 sm:h-12 object-contain"
                                                     loading="lazy"
                                                 />
                                             </div>
