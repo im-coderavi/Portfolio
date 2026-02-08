@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Plus, Loader2, Link as LinkIcon, Trash2, Edit, LogOut, Bell, BellOff, Briefcase, FolderKanban, Settings as SettingsIcon, Save as SaveIcon } from 'lucide-react';
+import { Plus, Loader2, Link as LinkIcon, Trash2, Edit, LogOut, Bell, BellOff, Briefcase, FolderKanban, Settings as SettingsIcon, Save as SaveIcon, BookOpen, Handshake } from 'lucide-react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import FadeIn from '../components/animations/FadeIn';
 import Button from '../components/common/Button';
 import ProjectForm from '../components/admin/ProjectForm';
 import ExperienceManager from '../components/admin/ExperienceManager';
+import KnowledgeBaseManager from '../components/admin/KnowledgeBaseManager';
+import DealsManager from '../components/admin/DealsManager';
 import API_URL from '../config/api';
 
 const Admin = () => {
@@ -36,9 +38,9 @@ const Admin = () => {
 
     const fetchSettings = async () => {
         try {
-            const token = localStorage.getItem('adminToken');
+            const password = localStorage.getItem('adminPassword');
             const response = await axios.get(`${API_URL}/api/admin/settings`, {
-                headers: { Authorization: `Bearer ${token}` }
+                headers: { 'X-Admin-Password': password }
             });
             if (response.data.success) {
                 setNotificationsEnabled(response.data.settings.notificationsEnabled);
@@ -53,7 +55,7 @@ const Admin = () => {
 
     const toggleNotifications = async () => {
         try {
-            const token = localStorage.getItem('adminToken');
+            const password = localStorage.getItem('adminPassword');
             const newState = !notificationsEnabled;
             // Optimistic update
             setNotificationsEnabled(newState);
@@ -61,7 +63,7 @@ const Admin = () => {
             await axios.post(`${API_URL}/api/admin/settings`, {
                 notificationsEnabled: newState
             }, {
-                headers: { Authorization: `Bearer ${token}` }
+                headers: { 'X-Admin-Password': password }
             });
         } catch (error) {
             console.error('Failed to update settings', error);
@@ -73,14 +75,14 @@ const Admin = () => {
     const handleSaveSettings = async (e) => {
         e.preventDefault();
         try {
-            const token = localStorage.getItem('adminToken');
+            const password = localStorage.getItem('adminPassword');
             await axios.post(`${API_URL}/api/admin/settings`, {
                 notificationsEnabled,
                 adsenseCode,
                 adsTxt,
                 metaTags
             }, {
-                headers: { Authorization: `Bearer ${token}` }
+                headers: { 'X-Admin-Password': password }
             });
             alert('Settings saved successfully');
         } catch (error) {
@@ -90,8 +92,8 @@ const Admin = () => {
     };
 
     useEffect(() => {
-        const token = localStorage.getItem('adminToken');
-        if (!token) {
+        const password = localStorage.getItem('adminPassword');
+        if (!password) {
             navigate('/admin/login');
             return;
         }
@@ -100,15 +102,15 @@ const Admin = () => {
     }, [navigate]);
 
     const handleLogout = () => {
-        localStorage.removeItem('adminToken');
+        localStorage.removeItem('adminPassword');
         navigate('/admin/login');
     };
 
     const handleCreate = async (projectData) => {
         try {
-            const token = localStorage.getItem('adminToken');
+            const password = localStorage.getItem('adminPassword');
             await axios.post(`${API_URL}/api/admin/projects`, projectData, {
-                headers: { Authorization: `Bearer ${token}` }
+                headers: { 'X-Admin-Password': password }
             });
             fetchProjects();
             setShowForm(false);
@@ -119,11 +121,11 @@ const Admin = () => {
 
     const handleUpdate = async (projectData) => {
         try {
-            const token = localStorage.getItem('adminToken');
+            const password = localStorage.getItem('adminPassword');
             await axios.put(
                 `${API_URL}/api/admin/projects/${editingProject._id}`,
                 projectData,
-                { headers: { Authorization: `Bearer ${token}` } }
+                { headers: { 'X-Admin-Password': password } }
             );
             fetchProjects();
             setEditingProject(null);
@@ -136,9 +138,9 @@ const Admin = () => {
         if (!window.confirm('Are you sure you want to delete this project?')) return;
 
         try {
-            const token = localStorage.getItem('adminToken');
+            const password = localStorage.getItem('adminPassword');
             await axios.delete(`${API_URL}/api/admin/projects/${id}`, {
-                headers: { Authorization: `Bearer ${token}` }
+                headers: { 'X-Admin-Password': password }
             });
             fetchProjects();
         } catch (error) {
@@ -218,6 +220,26 @@ const Admin = () => {
                         >
                             <Briefcase size={20} />
                             Experiences
+                        </button>
+                        <button
+                            onClick={() => setActiveTab('knowledge-base')}
+                            className={`flex items-center gap-2 px-6 py-3 rounded-xl font-medium transition-all ${activeTab === 'knowledge-base'
+                                ? 'bg-accent-cyan text-black'
+                                : 'bg-white/5 text-text-secondary hover:bg-white/10'
+                                }`}
+                        >
+                            <BookOpen size={20} />
+                            Knowledge Base
+                        </button>
+                        <button
+                            onClick={() => setActiveTab('deals')}
+                            className={`flex items-center gap-2 px-6 py-3 rounded-xl font-medium transition-all ${activeTab === 'deals'
+                                ? 'bg-accent-cyan text-black'
+                                : 'bg-white/5 text-text-secondary hover:bg-white/10'
+                                }`}
+                        >
+                            <Handshake size={20} />
+                            Deals
                         </button>
                         <button
                             onClick={() => setActiveTab('settings')}
@@ -328,6 +350,10 @@ const Admin = () => {
                 )}
 
                 {activeTab === 'experiences' && <ExperienceManager />}
+
+                {activeTab === 'knowledge-base' && <KnowledgeBaseManager />}
+
+                {activeTab === 'deals' && <DealsManager />}
 
                 {activeTab === 'settings' && (
                     <FadeIn>

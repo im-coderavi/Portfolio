@@ -1,4 +1,4 @@
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link as RouterLink } from 'react-router-dom';
 import { Link } from 'react-scroll';
 import { Github, Linkedin, Globe, Mail, Heart, ArrowUp } from 'lucide-react';
 import { motion } from 'framer-motion';
@@ -67,6 +67,29 @@ const Footer = () => {
                                 <social.icon size={20} className="sm:w-6 sm:h-6" />
                             </motion.a>
                         ))}
+                    </motion.div>
+
+                    {/* Legal Links */}
+                    <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={{ once: true }}
+                        transition={{ duration: 0.5, delay: 0.15 }}
+                        className="flex flex-wrap gap-4 sm:gap-6 justify-center text-sm"
+                    >
+                        <RouterLink
+                            to="/privacy-policy"
+                            className="text-text-secondary hover:text-accent-cyan transition-colors"
+                        >
+                            Privacy Policy
+                        </RouterLink>
+                        <span className="text-white/20">•</span>
+                        <RouterLink
+                            to="/terms-of-service"
+                            className="text-text-secondary hover:text-accent-cyan transition-colors"
+                        >
+                            Terms of Service
+                        </RouterLink>
                     </motion.div>
 
                     {/* Divider */}

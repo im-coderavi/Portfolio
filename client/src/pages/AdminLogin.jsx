@@ -18,14 +18,12 @@ const AdminLogin = () => {
         setError('');
 
         try {
-            const response = await axios.post(`${API_URL}/api/admin/login`, { password });
-
-            if (response.data.success) {
-                localStorage.setItem('adminToken', response.data.token);
-                navigate('/admin');
-            }
+            // Simply store password in localStorage
+            // Backend will verify on each request
+            localStorage.setItem('adminPassword', password);
+            navigate('/admin');
         } catch (err) {
-            setError(err.response?.data?.message || 'Login failed. Please check your password.');
+            setError('Login failed. Please try again.');
         } finally {
             setLoading(false);
         }

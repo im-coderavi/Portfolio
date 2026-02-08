@@ -9,12 +9,20 @@ const path = require('path');
 const fs = require('fs');
 const cloudinary = require('cloudinary').v2;
 const { CloudinaryStorage } = require('multer-storage-cloudinary');
+const pdfParse = require('pdf-parse');
+const axios = require('axios');
 require('dotenv').config();
 
 // Import Models
 const Project = require('./models/Project');
 const Settings = require('./models/Settings');
 const Experience = require('./models/Experience');
+const ChatConversation = require('./models/ChatConversation');
+const KnowledgeBase = require('./models/KnowledgeBase');
+const Deal = require('./models/Deal');
+
+// Import Chatbot Logic (Rule-based - No external API needed!)
+const { getBotResponse } = require('./config/chatbot');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -44,7 +52,7 @@ const initializeSettings = async () => {
     }
 };
 
-// Cloudinary Storage Configuration
+// Cloudinary Storage Configuration for Images
 const storage = new CloudinaryStorage({
     cloudinary: cloudinary,
     params: {
@@ -56,6 +64,21 @@ const storage = new CloudinaryStorage({
 
 const upload = multer({
     storage: storage,
+    limits: { fileSize: 5 * 1024 * 1024 } // 5MB limit
+});
+
+// Cloudinary Storage Configuration for PDFs (Knowledge Base)
+const pdfStorage = new CloudinaryStorage({
+    cloudinary: cloudinary,
+    params: {
+        folder: 'portfolio/knowledge-base',
+        allowed_formats: ['pdf'],
+        resource_type: 'raw'
+    }
+});
+
+const pdfUpload = multer({
+    storage: pdfStorage,
     limits: { fileSize: 5 * 1024 * 1024 } // 5MB limit
 });
 
@@ -73,7 +96,7 @@ const corsOptions = {
 app.use((req, res, next) => {
     res.header('Access-Control-Allow-Origin', '*');
     res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-    res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
+    res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization, X-Admin-Password');
 
     // Handle preflight requests
     if (req.method === 'OPTIONS') {
@@ -141,20 +164,19 @@ async function connectToDatabase(retries = 3) {
 connectToDatabase().catch(console.error);
 
 // Middleware to verify JWT token
+// Simple password-based authentication middleware
 const verifyToken = (req, res, next) => {
-    const token = req.header('Authorization')?.replace('Bearer ', '');
+    const password = req.header('X-Admin-Password');
 
-    if (!token) {
-        return res.status(401).json({ success: false, message: 'Access denied. No token provided.' });
+    if (!password) {
+        return res.status(401).json({ success: false, message: 'Admin password required' });
     }
 
-    try {
-        const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        req.admin = decoded;
-        next();
-    } catch (error) {
-        res.status(401).json({ success: false, message: 'Invalid or expired token.' });
+    if (password !== process.env.ADMIN_PASSWORD) {
+        return res.status(401).json({ success: false, message: 'Invalid admin password' });
     }
+
+    next();
 };
 
 // Middleware to ensure MongoDB connection before API routes
@@ -644,6 +666,598 @@ app.delete('/api/admin/experiences/:id', verifyToken, async (req, res) => {
     } catch (error) {
         console.error('Error deleting experience:', error);
         res.status(500).json({ success: false, message: 'Failed to delete experience' });
+    }
+});
+
+// ==================== AI CHATBOT ENDPOINTS ====================
+
+// Send message to chatbot
+app.post('/api/chat/message', async (req, res) => {
+    try {
+        const { sessionId, message } = req.body;
+
+        if (!sessionId || !message) {
+            return res.status(400).json({ success: false, message: 'Session ID and message are required' });
+        }
+
+        console.log(`💬 [/api/chat/message] Session: ${sessionId}, Message: ${message.substring(0, 50)}...`);
+
+        // Find or create conversation
+        let conversation = await ChatConversation.findOne({ sessionId });
+
+        if (!conversation) {
+            conversation = new ChatConversation({
+                sessionId,
+                messages: []
+            });
+        }
+
+        // Add user message to conversation
+        conversation.messages.push({
+            role: 'user',
+            content: message,
+            timestamp: new Date()
+        });
+        conversation.lastMessageAt = new Date();
+
+        // Get projects and experiences for context
+        const projects = await Project.find().select('title description technologies');
+        const experiences = await Experience.find().select('company position current');
+
+        // Get knowledge base for intelligent responses
+        const knowledgeBase = await KnowledgeBase.find().select('title content');
+
+        // Get bot response using rule-based system with knowledge base
+        const botReply = getBotResponse(message, projects, experiences, knowledgeBase);
+
+        console.log(`🤖 [/api/chat/message] Bot reply: ${botReply.substring(0, 50)}...`);
+
+        // Add bot response to conversation
+        conversation.messages.push({
+            role: 'assistant',
+            content: botReply,
+            timestamp: new Date()
+        });
+
+        // Save conversation
+        await conversation.save();
+
+        res.status(200).json({
+            success: true,
+            message: botReply,
+            sessionId: conversation.sessionId
+        });
+    } catch (error) {
+        console.error('❌ [/api/chat/message] Error:', error);
+
+        // Simple fallback for any errors
+        const fallbackMessage = `Sorry, I encountered an error processing your message. 
+
+**You can reach Avishek at:**
+📧 Email: avishekgiri31@gmail.com
+📝 Contact form on this website
+
+Please try again or contact directly!`;
+
+        res.status(200).json({
+            success: true,
+            message: fallbackMessage,
+            sessionId: req.body.sessionId
+        });
+    }
+});
+
+// Get conversation history
+app.get('/api/chat/history/:sessionId', async (req, res) => {
+    try {
+        const { sessionId } = req.params;
+
+        const conversation = await ChatConversation.findOne({ sessionId });
+
+        if (!conversation) {
+            return res.status(200).json({
+                success: true,
+                messages: []
+            });
+        }
+
+        res.status(200).json({
+            success: true,
+            messages: conversation.messages,
+            userInfo: conversation.userInfo,
+            projectConfirmed: conversation.projectConfirmed
+        });
+    } catch (error) {
+        console.error('❌ [/api/chat/history] Error:', error);
+        res.status(500).json({ success: false, message: 'Failed to fetch conversation history' });
+    }
+});
+
+// Confirm project interest
+app.post('/api/chat/confirm-project', async (req, res) => {
+    try {
+        const { sessionId, userInfo, projectDetails } = req.body;
+
+        if (!sessionId || !userInfo || !userInfo.name || !userInfo.email) {
+            return res.status(400).json({
+                success: false,
+                message: 'Session ID, name, and email are required'
+            });
+        }
+
+        console.log(`✅ [/api/chat/confirm-project] Project confirmed for session: ${sessionId}`);
+
+        // Update conversation
+        const conversation = await ChatConversation.findOneAndUpdate(
+            { sessionId },
+            {
+                userInfo,
+                projectDetails: projectDetails || '',
+                projectConfirmed: true,
+                confirmedAt: new Date()
+            },
+            { new: true }
+        );
+
+        if (!conversation) {
+            return res.status(404).json({ success: false, message: 'Conversation not found' });
+        }
+
+        // Prepare conversation summary for email
+        const conversationSummary = conversation.messages
+            .map(msg => `<p><strong>${msg.role === 'user' ? 'Visitor' : 'AI Assistant'}:</strong> ${msg.content}</p>`)
+            .join('');
+
+        // Send email notification
+        const mailOptions = {
+            from: process.env.EMAIL_USER,
+            to: process.env.RECIPIENT_EMAIL,
+            subject: '🚀 New Project Inquiry from AI Chatbot',
+            html: `
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <meta charset="UTF-8">
+                    <style>
+                        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f5f7fa; margin: 0; padding: 0; }
+                        .container { max-width: 600px; margin: 40px auto; background: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1); }
+                        .header { background: linear-gradient(135deg, #00F5FF 0%, #0066FF 100%); padding: 40px 30px; text-align: center; }
+                        .header h1 { margin: 0; color: #ffffff; font-size: 28px; }
+                        .content { padding: 40px 30px; }
+                        .info-row { display: flex; margin-bottom: 20px; padding: 15px; background: #f8f9fa; border-radius: 10px; border-left: 4px solid #00F5FF; }
+                        .info-label { font-weight: 600; color: #333; min-width: 100px; }
+                        .info-value { color: #555; flex: 1; }
+                        .conversation-box { background: #f8f9fa; padding: 25px; border-radius: 12px; margin: 25px 0; border: 1px solid #dee2e6; max-height: 400px; overflow-y: auto; }
+                        .footer { background: #f8f9fa; padding: 25px 30px; text-align: center; color: #6c757d; font-size: 13px; }
+                    </style>
+                </head>
+                <body>
+                    <div class="container">
+                        <div class="header">
+                            <h1>🤖 New Project Inquiry via AI Chatbot</h1>
+                            <p>A visitor confirmed their interest in working with you!</p>
+                        </div>
+                        <div class="content">
+                            <h2>Contact Information</h2>
+                            <div class="info-row">
+                                <div class="info-label">👤 Name:</div>
+                                <div class="info-value"><strong>${userInfo.name}</strong></div>
+                            </div>
+                            <div class="info-row">
+                                <div class="info-label">📧 Email:</div>
+                                <div class="info-value"><a href="mailto:${userInfo.email}">${userInfo.email}</a></div>
+                            </div>
+                            ${userInfo.phone ? `
+                            <div class="info-row">
+                                <div class="info-label">📱 Phone:</div>
+                                <div class="info-value">${userInfo.phone}</div>
+                            </div>
+                            ` : ''}
+                            
+                            ${projectDetails ? `
+                            <h2>Project Details</h2>
+                            <div class="info-row">
+                                <div class="info-value">${projectDetails}</div>
+                            </div>
+                            ` : ''}
+                            
+                            <h2>Conversation History</h2>
+                            <div class="conversation-box">
+                                ${conversationSummary}
+                            </div>
+                        </div>
+                        <div class="footer">
+                            <p>Sent from your AI Chatbot Assistant</p>
+                            <p>${new Date().toLocaleString()}</p>
+                        </div>
+                    </div>
+                </body>
+                </html>
+            `
+        };
+
+        try {
+            await transporter.sendMail(mailOptions);
+            console.log(`✅ [/api/chat/confirm-project] Email sent successfully`);
+        } catch (emailError) {
+            console.error('❌ [/api/chat/confirm-project] Email error:', emailError);
+            // Don't fail the request if email fails
+        }
+
+        res.status(200).json({
+            success: true,
+            message: 'Project confirmation received! Avishek will reach out to you soon.',
+            conversation
+        });
+    } catch (error) {
+        console.error('❌ [/api/chat/confirm-project] Error:', error);
+        res.status(500).json({ success: false, message: 'Failed to confirm project' });
+    }
+});
+
+// Get all conversations (Admin only)
+app.get('/api/admin/chat/conversations', verifyToken, async (req, res) => {
+    try {
+        const conversations = await ChatConversation.find()
+            .sort({ lastMessageAt: -1 })
+            .select('-__v');
+
+        const stats = {
+            total: conversations.length,
+            confirmed: conversations.filter(c => c.projectConfirmed).length,
+            pending: conversations.filter(c => !c.projectConfirmed).length
+        };
+
+        res.status(200).json({
+            success: true,
+            conversations,
+            stats
+        });
+    } catch (error) {
+        console.error('❌ [/api/admin/chat/conversations] Error:', error);
+        res.status(500).json({ success: false, message: 'Failed to fetch conversations' });
+    }
+});
+
+// Delete conversation (Admin only)
+app.delete('/api/admin/chat/conversations/:sessionId', verifyToken, async (req, res) => {
+    try {
+        const { sessionId } = req.params;
+
+        const conversation = await ChatConversation.findOneAndDelete({ sessionId });
+
+        if (!conversation) {
+            return res.status(404).json({ success: false, message: 'Conversation not found' });
+        }
+
+        res.status(200).json({
+            success: true,
+            message: 'Conversation deleted successfully'
+        });
+    } catch (error) {
+        console.error('❌ [/api/admin/chat/conversations] Error:', error);
+        res.status(500).json({ success: false, message: 'Failed to delete conversation' });
+    }
+});
+
+// ============================================
+// KNOWLEDGE BASE MANAGEMENT ENDPOINTS
+// ============================================
+
+// Upload PDF to knowledge base (Admin only)
+app.post('/api/admin/knowledge-base/upload', verifyToken, pdfUpload.single('pdf'), async (req, res) => {
+    try {
+        const { title } = req.body;
+
+        if (!req.file) {
+            return res.status(400).json({ success: false, message: 'PDF file is required' });
+        }
+
+        if (!title) {
+            return res.status(400).json({ success: false, message: 'Title is required' });
+        }
+
+        console.log('📄 [/api/admin/knowledge-base/upload] Uploading PDF:', title);
+
+        // Download PDF from Cloudinary to extract text
+        const response = await axios.get(req.file.path, { responseType: 'arraybuffer' });
+        const buffer = response.data;
+
+        // Extract text from PDF
+        const pdfData = await pdfParse(buffer);
+        const extractedText = pdfData.text;
+
+        console.log(`📄 Extracted ${extractedText.length} characters from PDF`);
+
+        // Save to database
+        const knowledgeBase = new KnowledgeBase({
+            title,
+            filename: req.file.filename,
+            content: extractedText,
+            fileUrl: req.file.path,
+            uploadedBy: 'admin'
+        });
+
+        await knowledgeBase.save();
+
+        res.status(201).json({
+            success: true,
+            message: 'PDF uploaded and processed successfully',
+            knowledgeBase: {
+                id: knowledgeBase._id,
+                title: knowledgeBase.title,
+                filename: knowledgeBase.filename,
+                contentLength: extractedText.length
+            }
+        });
+    } catch (error) {
+        console.error('❌ [/api/admin/knowledge-base/upload] Error:', error);
+        res.status(500).json({ success: false, message: 'Failed to upload PDF', error: error.message });
+    }
+});
+
+// Get all knowledge base items (Admin only)
+app.get('/api/admin/knowledge-base', verifyToken, async (req, res) => {
+    try {
+        const knowledgeBase = await KnowledgeBase.find()
+            .select('-content') // Exclude large content field
+            .sort({ createdAt: -1 });
+
+        res.status(200).json({
+            success: true,
+            count: knowledgeBase.length,
+            knowledgeBase
+        });
+    } catch (error) {
+        console.error('❌ [/api/admin/knowledge-base] Error:', error);
+        res.status(500).json({ success: false, message: 'Failed to fetch knowledge base' });
+    }
+});
+
+// Delete knowledge base item (Admin only)
+app.delete('/api/admin/knowledge-base/:id', verifyToken, async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        const kb = await KnowledgeBase.findById(id);
+
+        if (!kb) {
+            return res.status(404).json({ success: false, message: 'Knowledge base item not found' });
+        }
+
+        // Delete from Cloudinary
+        const publicId = kb.fileUrl.split('/').slice(-2).join('/').split('.')[0];
+        await cloudinary.uploader.destroy(publicId, { resource_type: 'raw' });
+
+        // Delete from database
+        await KnowledgeBase.findByIdAndDelete(id);
+
+        res.status(200).json({
+            success: true,
+            message: 'Knowledge base item deleted successfully'
+        });
+    } catch (error) {
+        console.error('❌ [/api/admin/knowledge-base/:id] Error:', error);
+        res.status(500).json({ success: false, message: 'Failed to delete knowledge base item' });
+    }
+});
+
+// ============================================
+// DEAL MANAGEMENT ENDPOINTS
+// ============================================
+
+// Create deal from conversation
+app.post('/api/chat/create-deal', async (req, res) => {
+    try {
+        const { sessionId, userInfo, projectDetails, budget, timeline } = req.body;
+
+        if (!sessionId || !userInfo || !projectDetails) {
+            return res.status(400).json({
+                success: false,
+                message: 'Session ID, user info, and project details are required'
+            });
+        }
+
+        // Find conversation
+        const conversation = await ChatConversation.findOne({ sessionId });
+
+        if (!conversation) {
+            return res.status(404).json({ success: false, message: 'Conversation not found' });
+        }
+
+        // Create deal
+        const deal = new Deal({
+            conversationId: conversation._id,
+            userInfo,
+            projectDetails,
+            budget,
+            timeline,
+            status: 'open'
+        });
+
+        await deal.save();
+
+        // Update conversation
+        conversation.dealId = deal._id;
+        conversation.hasDeal = true;
+        conversation.dealStatus = 'open';
+        await conversation.save();
+
+        res.status(201).json({
+            success: true,
+            message: 'Deal created successfully',
+            dealId: deal._id
+        });
+    } catch (error) {
+        console.error('❌ [/api/chat/create-deal] Error:', error);
+        res.status(500).json({ success: false, message: 'Failed to create deal' });
+    }
+});
+
+// Close deal and send email
+app.post('/api/chat/close-deal', async (req, res) => {
+    try {
+        const { dealId, notes } = req.body;
+
+        if (!dealId) {
+            return res.status(400).json({ success: false, message: 'Deal ID is required' });
+        }
+
+        // Find and update deal
+        const deal = await Deal.findById(dealId).populate('conversationId');
+
+        if (!deal) {
+            return res.status(404).json({ success: false, message: 'Deal not found' });
+        }
+
+        deal.status = 'closed';
+        deal.closedAt = new Date();
+        if (notes) deal.notes = notes;
+        await deal.save();
+
+        // Update conversation
+        await ChatConversation.findByIdAndUpdate(deal.conversationId._id, {
+            dealStatus: 'closed'
+        });
+
+        // Prepare email
+        const conversation = deal.conversationId;
+        const conversationSummary = conversation.messages
+            .map(msg => `<p><strong>${msg.role === 'user' ? 'Client' : 'AI'}:</strong> ${msg.content}</p>`)
+            .join('');
+
+        const mailOptions = {
+            from: process.env.EMAIL_USER,
+            to: process.env.RECIPIENT_EMAIL,
+            subject: `🎉 Deal Closed - ${deal.userInfo.name}`,
+            html: `
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <style>
+                        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+                        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+                        .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0; }
+                        .content { background: #f9f9f9; padding: 30px; border-radius: 0 0 10px 10px; }
+                        .section { background: white; padding: 20px; margin: 20px 0; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+                        .label { font-weight: bold; color: #667eea; }
+                        .conversation { max-height: 300px; overflow-y: auto; background: #f5f5f5; padding: 15px; border-radius: 5px; }
+                    </style>
+                </head>
+                <body>
+                    <div class="container">
+                        <div class="header">
+                            <h1>🎉 Deal Closed Successfully!</h1>
+                        </div>
+                        <div class="content">
+                            <div class="section">
+                                <h2>Client Information</h2>
+                                <p><span class="label">Name:</span> ${deal.userInfo.name}</p>
+                                <p><span class="label">Email:</span> ${deal.userInfo.email}</p>
+                                <p><span class="label">Phone:</span> ${deal.userInfo.phone || 'Not provided'}</p>
+                            </div>
+                            
+                            <div class="section">
+                                <h2>Project Details</h2>
+                                <p>${deal.projectDetails}</p>
+                            </div>
+                            
+                            <div class="section">
+                                <h2>Budget & Timeline</h2>
+                                <p><span class="label">Budget:</span> ${deal.budget || 'Not specified'}</p>
+                                <p><span class="label">Timeline:</span> ${deal.timeline || 'Not specified'}</p>
+                            </div>
+                            
+                            ${notes ? `
+                            <div class="section">
+                                <h2>Notes</h2>
+                                <p>${notes}</p>
+                            </div>
+                            ` : ''}
+                            
+                            <div class="section">
+                                <h2>Conversation History</h2>
+                                <div class="conversation">
+                                    ${conversationSummary}
+                                </div>
+                            </div>
+                            
+                            <div class="section">
+                                <h2>Next Steps</h2>
+                                <p>✅ Review the project details</p>
+                                <p>✅ Reach out to the client at ${deal.userInfo.email}</p>
+                                <p>✅ Prepare a detailed proposal</p>
+                            </div>
+                        </div>
+                    </div>
+                </body>
+                </html>
+            `
+        };
+
+        await transporter.sendMail(mailOptions);
+
+        res.status(200).json({
+            success: true,
+            message: 'Deal closed and notification sent successfully'
+        });
+    } catch (error) {
+        console.error('❌ [/api/chat/close-deal] Error:', error);
+        res.status(500).json({ success: false, message: 'Failed to close deal' });
+    }
+});
+
+// Get all deals (Admin only)
+app.get('/api/admin/deals', verifyToken, async (req, res) => {
+    try {
+        const { status } = req.query;
+
+        const filter = status ? { status } : {};
+
+        const deals = await Deal.find(filter)
+            .populate('conversationId', 'sessionId messages')
+            .sort({ createdAt: -1 });
+
+        res.status(200).json({
+            success: true,
+            count: deals.length,
+            deals
+        });
+    } catch (error) {
+        console.error('❌ [/api/admin/deals] Error:', error);
+        res.status(500).json({ success: false, message: 'Failed to fetch deals' });
+    }
+});
+
+// Update deal status (Admin only)
+app.patch('/api/admin/deals/:id', verifyToken, async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { status, notes } = req.body;
+
+        const deal = await Deal.findByIdAndUpdate(
+            id,
+            { status, notes, ...(status === 'closed' && { closedAt: new Date() }) },
+            { new: true }
+        );
+
+        if (!deal) {
+            return res.status(404).json({ success: false, message: 'Deal not found' });
+        }
+
+        // Update conversation
+        await ChatConversation.findByIdAndUpdate(deal.conversationId, {
+            dealStatus: status
+        });
+
+        res.status(200).json({
+            success: true,
+            message: 'Deal updated successfully',
+            deal
+        });
+    } catch (error) {
+        console.error('❌ [/api/admin/deals/:id] Error:', error);
+        res.status(500).json({ success: false, message: 'Failed to update deal' });
     }
 });
 
