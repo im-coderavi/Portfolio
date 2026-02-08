@@ -10,7 +10,7 @@
 [![MongoDB](https://img.shields.io/badge/MongoDB-Atlas-47A248?style=for-the-badge&logo=mongodb)](https://www.mongodb.com/)
 [![License](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)](LICENSE)
 
-**A high-performance, aesthetically stunning MERN stack portfolio featuring a dynamic admin panel, cloud-based asset management, and cutting-edge responsive design.**
+**A high-performance, aesthetically stunning MERN stack portfolio featuring a dynamic admin panel, cloud-based asset management, and an intelligent AI chatbot.**
 
 [View Live Demo](https://coderavi.in) · [Report Bug](https://github.com/im-coderavi/Portfolio/issues) · [Request Feature](https://github.com/im-coderavi/Portfolio/issues)
 
@@ -22,7 +22,7 @@
 
 ## 📖 About The Project
 
-This portfolio is not just a showcase of work; it's a statement of engineering excellence and design precision. Built with the latest **MERN stack** technologies, it features a **glassmorphism-inspired UI**, fluid animations, and a robust backend infrastructure. The project is designed to be fully responsive, ensuring a seamless experience across all devices, from mobile phones to 4K desktops.
+This portfolio is a statement of engineering excellence and design precision. Built with the latest **MERN stack** technologies, it features a **glassmorphism-inspired UI**, fluid animations, and a robust backend infrastructure. The project is designed to be fully responsive, ensuring a seamless experience across all devices, from mobile phones to 4K desktops.
 
 ### Key Features
 
@@ -36,17 +36,22 @@ This portfolio is not just a showcase of work; it's a statement of engineering e
     -   **Experience Timeline**: A vertical journey through professional milestones.
     -   **Live Contact Form**: Instant email delivery via Nodemailer with spam protection.
 
+#### 🤖 Smart AI Chatbot
+-   **Intelligent Assistant**: A custom-built chatbot that acts as a personal assistant, answering questions about skills, experience, and availability.
+-   **Context-Aware**: Uses a sophisticated rule-based engine (with experimental Gemini AI integration) to provide accurate, context-aware responses.
+-   **Lead Generation**: Capable of guiding visitors towards collaboration and scheduling calls.
+
 #### 🔐 Robust Admin Panel
 -   **Secure Authentication**: JWT-based login system protecting all administrative routes.
 -   **CMS Capabilities**:
     -   **Project Management**: Add, edit, and delete projects with drag-and-drop image uploads directly to Cloudinary.
     -   **Experience Management**: Update work history in real-time without touching code.
-    -   **Settings Control**: Toggle features like email notifications and manage global site settings.
+    -   **Settings Control**: Toggle features like email notifications, update AdSense codes, and manage global site settings.
 
 #### 🛠️ Backend Architecture
 -   **Serverless-Ready**: Optimized structure for seamless deployment on Vercel Serverless Functions.
 -   **Cloudinary Integration**: High-performance image CDN for optimized asset delivery.
--   **MongoDB Atlas**: scalable, cloud-native database for persistent data storage.
+-   **MongoDB Atlas**: Scalable, cloud-native database for persistent data storage.
 -   **Security First**: Implemented CORS policies, Helmet security headers, and input validation.
 
 ---
@@ -56,11 +61,11 @@ This portfolio is not just a showcase of work; it's a statement of engineering e
 ### Frontend
 -   **Framework**: [React 19](https://react.dev/)
 -   **Build Tool**: [Vite](https://vitejs.dev/)
--   **Styling**: [Tailwind CSS](https://tailwindcss.com/)
+-   **Styling**: [Tailwind CSS v3](https://tailwindcss.com/), [PostCSS](https://postcss.org/), [Autoprefixer](https://github.com/postcss/autoprefixer)
 -   **Animations**: [Framer Motion](https://www.framer.com/motion/)
 -   **Routing**: [React Router DOM v7](https://reactrouter.com/)
 -   **Icons**: [Lucide React](https://lucide.dev/), [React Icons](https://react-icons.github.io/react-icons/)
--   **State/Data**: [Axios](https://axios-http.com/)
+-   **State/Data**: [Axios](https://axios-http.com/), [React Hook Form](https://react-hook-form.com/), [Zod](https://zod.dev/)
 
 ### Backend
 -   **Runtime**: [Node.js](https://nodejs.org/)
@@ -69,13 +74,13 @@ This portfolio is not just a showcase of work; it's a statement of engineering e
 -   **Authentication**: [JSON Web Tokens (JWT)](https://jwt.io/)
 -   **Storage**: [Cloudinary](https://cloudinary.com/) (Multer Storage Cloudinary)
 -   **Email**: [Nodemailer](https://nodemailer.com/)
+-   **AI**: [Google Generative AI (Gemini)](https://ai.google.dev/) (Infrastructure ready)
 
 ### DevOps & Tools
 -   **Deployment**: [Vercel](https://vercel.com/) (Frontend & Backend)
 -   **Version Control**: Git & GitHub
 
 ---
-
 
 ## ⚡ Getting Started
 
@@ -87,6 +92,9 @@ Ensure you have the following installed:
 -   **Node.js** (v18 or higher)
 -   **npm** or **yarn**
 -   **Git**
+-   **MongoDB Atlas Account**
+-   **Cloudinary Account**
+-   **Google Account** (for Gmail SMTP or App Password)
 
 ### Installation
 
@@ -103,25 +111,30 @@ Ensure you have the following installed:
     npm install
     ```
 
-    Create a `.env` file in the `server` directory with the following variables:
+    Create a `.env` file in the `server` directory based on `.env.example`:
     ```env
     # Server Configuration
     PORT=5000
+
+    # MongoDB Database Connection
     MONGODB_URI=your_mongodb_connection_string
 
     # Security
     JWT_SECRET=your_super_secret_jwt_key
     ADMIN_PASSWORD=YourStrongAdminPassword
 
-    # Email Service (Gmail)
-    EMAIL_USER=your_email@gmail.com
-    EMAIL_PASS=your_app_password
-    RECIPIENT_EMAIL=your_email@gmail.com
+    # Email Configuration (Gmail App Password)
+    EMAIL_USER=your-email@gmail.com
+    EMAIL_PASS=your-app-password
+    RECIPIENT_EMAIL=your-receiving-email@gmail.com
 
-    # Cloudinary (Image Storage)
+    # Cloudinary Configuration
     CLOUDINARY_CLOUD_NAME=your_cloud_name
     CLOUDINARY_API_KEY=your_api_key
     CLOUDINARY_API_SECRET=your_api_secret
+
+    # AI Integration (Optional)
+    GEMINI_API_KEY=your_gemini_api_key
     ```
 
     Start the development server:
@@ -147,8 +160,6 @@ Ensure you have the following installed:
 
 ## 📁 Project Structure
 
-A high-level overview of the project's file organization.
-
 ```bash
 PORTFOLIO/
 ├── client/                 # Frontend Application (React + Vite)
@@ -156,27 +167,25 @@ PORTFOLIO/
 │   ├── src/
 │   │   ├── assets/         # Images, fonts, and global assets
 │   │   ├── components/     # Reusable UI components
+│   │   │   ├── admin/      # Admin specific components
+│   │   │   ├── chatbot/    # AI Chatbot components
 │   │   │   ├── common/     # Shared components (Buttons, Inputs)
 │   │   │   ├── layout/     # Structural components (Navbar, Footer)
 │   │   │   └── sections/   # Page sections (Hero, Projects, Contact)
-│   │   ├── config/         # App configuration & API setup
-│   │   ├── context/        # Global state management using Context API
+│   │   ├── config/         # App configuration (API URL)
+│   │   ├── context/        # Global state management
 │   │   ├── hooks/          # Custom React hooks
-│   │   ├── pages/          # Application routes (Home, Admin, Login)
+│   │   ├── pages/          # Application routes
 │   │   ├── styles/         # Global styles and Tailwind directives
-│   │   ├── utils/          # Helper functions and utilities
-│   │   ├── App.jsx         # Main application component
-│   │   └── main.jsx        # Application entry point
-│   ├── index.html          # HTML template
-│   ├── vite.config.js      # Vite configuration
-│   └── tailwind.config.js  # Tailwind CSS configuration
+│   │   └── utils/          # Helper functions
+│   └── ...config files     # Vite, Tailwind, ESLint configs
 │
 ├── server/                 # Backend API (Node.js + Express)
-│   ├── data/               # Seed data or static JSON files
-│   ├── middleware/         # Custom middleware (Auth, Error handling)
-│   ├── models/             # Mongoose schemas (Project, Experience, Settings)
+│   ├── config/             # Configuration (Chatbot logic, Gemini)
+│   ├── models/             # Mongoose schemas (Project, Experience, Settings, Message)
+│   ├── routes/             # API Routes
 │   ├── uploads/            # Local directory for file uploads (dev only)
-│   ├── .env                # Environment variables (gitignored)
+│   ├── .env                # Environment variables
 │   ├── index.js            # Main server entry point
 │   └── vercel.json         # Vercel deployment configuration
 │
@@ -187,19 +196,18 @@ PORTFOLIO/
 
 ## 🚀 Deployment
 
-The project is configured for seamless deployment on **Vercel**.
+The project is optimized for **Vercel**.
 
 ### Backend Deployment
-1.  Push your code to concise GitHub repository.
-2.  Import the `server` directory as a new project in Vercel.
-3.  Add all environment variables from your `.env` file to the Vercel project settings.
-4.  Deploy. Vercel will automatically detect the `vercel.json` configuration.
+1.  Push your code to GitHub.
+2.  Import the `server` directory as a project in Vercel.
+3.  Add all environment variables from your `.env` file to Vercel Settings.
+4.  Deploy.
 
 ### Frontend Deployment
-1.  Import the `client` directory as a new project in Vercel.
-2.  Vercel will auto-detect the Vite framework settings.
+1.  Import the `client` directory as a project in Vercel.
+2.  Add the `VITE_API_URL` environment variable pointing to your deployed backend URL (if configured) or ensure your `client/src/config/api.js` points to the correct backend.
 3.  Deploy.
-4.  **Note**: Ensure the frontend's API calls point to your deployed backend URL.
 
 ---
 
@@ -210,10 +218,12 @@ The project is configured for seamless deployment on **Vercel**.
 | `GET` | `/api/projects` | Retrieve all portfolio projects | Public |
 | `GET` | `/api/experiences` | Retrieve work experience timeline | Public |
 | `POST` | `/api/contact` | Send a contact form message | Public |
+| `POST` | `/api/chat/message` | Send a message to the AI Chatbot | Public |
 | `POST` | `/api/admin/login` | Authenticate as admin | Public |
 | `POST` | `/api/admin/projects` | Create a new project | **Admin** |
 | `PUT` | `/api/admin/projects/:id` | Update an existing project | **Admin** |
-| `DELETE` | `/api/admin/projects/:id` | Delete a project | **Admin** |
+| `GET` | `/api/admin/settings` | Get site settings | **Admin** |
+| `POST` | `/api/admin/settings` | Update site settings (toggle notifications, etc.) | **Admin** |
 
 ---
 
@@ -237,6 +247,6 @@ Distributed under the MIT License. See `LICENSE` for more information.
 
 <div align="center">
 
-**Designed & Developed with ❤️ by [Avishek Giri](https://avishekgiri.dev)**
+**Designed & Developed with ❤️ by [Avishek Giri](https://coderavi.in)**
 
 </div>
