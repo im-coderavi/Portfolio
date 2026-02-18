@@ -1,27 +1,13 @@
 import React from 'react';
-import { motion } from 'framer-motion';
-import clsx from 'clsx';
 
-const Card = ({
-    children,
-    className = '',
-    hover = true,
-    gradient = false
-}) => {
+const Card = ({ children, className = '', hover = true, ...props }) => {
     return (
-        <motion.div
-            whileHover={hover ? { y: -5 } : {}}
-            className={clsx(
-                'glass rounded-2xl p-6 transition-all duration-300',
-                'dark:bg-white/5 dark:border-white/10',
-                'light:bg-white light:border-gray-200',
-                gradient && 'bg-gradient-to-br from-primary-light to-primary-dark',
-                hover && 'hover:shadow-lg dark:hover:shadow-accent-cyan/10 light:hover:shadow-gray-300',
-                className
-            )}
+        <div
+            className={`glass rounded-2xl ${hover ? 'hover:-translate-y-1' : ''} transition-all duration-300 ${className}`}
+            {...props}
         >
             {children}
-        </motion.div>
+        </div>
     );
 };
 

@@ -16,10 +16,10 @@ const Button = ({
     const baseStyles = 'font-semibold rounded-xl transition-all duration-300 flex items-center justify-center gap-3 relative overflow-hidden';
 
     const variants = {
-        primary: 'bg-gradient-to-r from-accent-cyan to-accent-blue text-white hover:shadow-lg hover:shadow-accent-cyan/50',
-        secondary: 'bg-white/10 dark:bg-white/10 light:bg-gray-200 text-white dark:text-white light:text-gray-900 border border-white/20 dark:border-white/20 light:border-gray-300 hover:bg-white/20 dark:hover:bg-white/20 light:hover:bg-gray-300',
-        ghost: 'text-text-secondary dark:text-text-secondary light:text-gray-700 hover:bg-white/10 dark:hover:bg-white/10 light:hover:bg-gray-100',
-        outline: 'border-2 border-accent-cyan text-accent-cyan hover:bg-accent-cyan hover:text-primary-dark',
+        primary: 'bg-gradient-to-r from-accent-purple to-accent-cyan text-white hover:shadow-lg hover:shadow-accent-purple/40 hover:scale-[1.02]',
+        secondary: 'bg-white/5 text-white border border-white/10 hover:bg-white/10 hover:border-accent-purple/50',
+        ghost: 'text-text-secondary hover:bg-white/5 hover:text-white',
+        outline: 'border-2 border-accent-purple text-accent-purple hover:bg-accent-purple hover:text-white',
     };
 
     const sizes = {

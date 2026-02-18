@@ -337,28 +337,38 @@ app.post('/api/contact', async (req, res) => {
 // ==================== ADMIN ENDPOINTS ====================
 
 // Admin login endpoint
+// Admin login endpoint
 app.post('/api/admin/login', async (req, res) => {
-    const { password } = req.body;
+    const { username, password } = req.body;
 
-    if (!password) {
-        return res.status(400).json({ success: false, message: 'Password is required' });
+    if (!username || !password) {
+        return res.status(400).json({ success: false, message: 'Identity and Security Key are required' });
     }
 
-    // Compare password
+    // Security Check 1: Identity Verification
+    if (username !== 'Avishek') {
+        // We warn them, but don't explicitly say "Wrong username" for partial security through obscurity,
+        // or we can be explicit. Let's be secure but clear for the owner.
+        // Actually, for max security, we might want to say "Invalid credentials" generic.
+        // But per request: "only Avishek Can unlock".
+        return res.status(401).json({ success: false, message: 'Access Denied: Restricted Identity' });
+    }
+
+    // Security Check 2: Key Verification
     if (password !== process.env.ADMIN_PASSWORD) {
-        return res.status(401).json({ success: false, message: 'Invalid password' });
+        return res.status(401).json({ success: false, message: 'Invalid Admin Security Key' });
     }
 
     // Generate JWT token
     const token = jwt.sign(
-        { admin: true, timestamp: Date.now() },
+        { admin: true, user: 'Avishek', timestamp: Date.now() },
         process.env.JWT_SECRET,
         { expiresIn: '24h' }
     );
 
     res.status(200).json({
         success: true,
-        message: 'Login successful',
+        message: 'Security Clearance Granted',
         token
     });
 });

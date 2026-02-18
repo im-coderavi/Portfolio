@@ -18,164 +18,141 @@ const Hero = () => {
     ];
 
     return (
-        <section id="hero" className="min-h-screen flex items-center justify-center relative overflow-hidden pt-20 bg-primary-dark dark:bg-primary-dark light:bg-gray-50 transition-colors duration-300">
+        <section id="hero" className="min-h-screen flex items-center justify-center relative overflow-hidden pt-20 bg-black">
             {/* Background Gradient Mesh */}
             <div className="absolute inset-0 -z-10">
-                <div className="absolute top-0 left-0 w-96 h-96 bg-accent-cyan/20 rounded-full blur-3xl"></div>
-                <div className="absolute bottom-0 right-0 w-96 h-96 bg-accent-pink/20 rounded-full blur-3xl"></div>
-                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-accent-purple/10 rounded-full blur-3xl"></div>
+                <div className="absolute top-0 left-0 w-[500px] h-[500px] bg-accent-purple/10 rounded-full blur-[120px]" />
+                <div className="absolute bottom-0 right-0 w-[500px] h-[500px] bg-accent-cyan/8 rounded-full blur-[120px]" />
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[300px] h-[300px] bg-accent-violet/5 rounded-full blur-[80px]" />
             </div>
 
-            <div className="max-w-7xl mx-auto px-6 py-20 grid md:grid-cols-[60%_40%] gap-12 items-center">
-                {/* Profile Image - Shows FIRST on mobile, SECOND on desktop */}
-                <FadeIn direction="up" delay={0.3} className="order-1 md:order-2">
-                    <div className="relative flex justify-center items-center">
-                        <motion.div
-                            animate={{
-                                y: [0, -20, 0],
-                            }}
-                            transition={{
-                                duration: 6,
-                                repeat: Infinity,
-                                ease: "easeInOut"
-                            }}
-                            className="relative"
-                        >
-                            {/* Gradient Border Frame */}
-                            <div className="absolute inset-0 bg-gradient-to-r from-accent-cyan via-accent-blue to-accent-purple rounded-3xl blur-xl opacity-50"></div>
+            {/* Grid Pattern */}
+            <div className="absolute inset-0 -z-10 opacity-[0.03]"
+                style={{
+                    backgroundImage: 'linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)',
+                    backgroundSize: '50px 50px'
+                }}
+            />
 
-                            {/* Image Container */}
-                            <div className="relative w-64 h-64 md:w-80 md:h-80 lg:w-96 lg:h-96 rounded-3xl overflow-hidden border-4 border-white/10 dark:border-white/10 light:border-black/10 bg-gradient-to-br from-primary-light to-primary-dark dark:from-primary-light dark:to-primary-dark light:from-gray-100 light:to-gray-200">
-                                {/* Profile Image */}
-                                <img
-                                    src="/assets/images/profile.jpg"
-                                    alt="Avishek Giri - Full Stack Developer"
-                                    className="w-full h-full object-cover"
-                                    onError={(e) => {
-                                        // Show initials if image not found
-                                        e.target.style.display = 'none';
-                                        const fallback = e.target.nextElementSibling;
-                                        if (fallback) {
-                                            fallback.style.display = 'flex';
-                                        }
-                                    }}
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 w-full py-12">
+                <div className="grid md:grid-cols-[60%_40%] gap-10 items-center">
+
+                    {/* LEFT — Text Content */}
+                    <div className="space-y-5 text-left order-2 md:order-1">
+                        <FadeIn direction="up" delay={0.2}>
+                            <p className="text-accent-cyan text-sm sm:text-base font-medium tracking-widest uppercase">
+                                Hi, I'm
+                            </p>
+                        </FadeIn>
+
+                        <FadeIn direction="up" delay={0.3}>
+                            <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-display font-bold uppercase tracking-wider text-gradient leading-tight">
+                                AVISHEK GIRI
+                            </h1>
+                        </FadeIn>
+
+                        <FadeIn direction="up" delay={0.4}>
+                            <div className="h-10 sm:h-14 flex items-center">
+                                <TypeAnimation
+                                    sequence={[
+                                        'Full Stack Developer', 2000,
+                                        'MERN Stack Expert', 2000,
+                                        'AI Integration Specialist', 2000,
+                                        'Freelance Developer', 2000,
+                                    ]}
+                                    wrapper="span"
+                                    speed={50}
+                                    repeat={Infinity}
+                                    className="text-xl sm:text-2xl md:text-3xl font-bold text-white"
                                 />
-                                {/* Fallback - Only shows when image fails to load */}
-                                <div className="w-full h-full hidden items-center justify-center text-6xl font-bold text-gradient absolute inset-0">
-                                    AG
-                                </div>
                             </div>
-                        </motion.div>
+                        </FadeIn>
 
-                        {/* Floating Decorative Elements */}
-                        <motion.div
-                            animate={{
-                                rotate: 360,
-                            }}
-                            transition={{
-                                duration: 20,
-                                repeat: Infinity,
-                                ease: "linear"
-                            }}
-                            className="absolute -top-10 -right-10 w-20 h-20 border-2 border-accent-cyan/30 rounded-full"
-                        ></motion.div>
+                        <FadeIn direction="up" delay={0.5}>
+                            <p className="text-text-secondary text-sm sm:text-base md:text-lg max-w-xl leading-relaxed">
+                                Crafting scalable web applications with modern technologies and AI-driven innovation.
+                                Specialized in building production-ready solutions that drive business growth.
+                            </p>
+                        </FadeIn>
 
-                        <motion.div
-                            animate={{
-                                rotate: -360,
-                            }}
-                            transition={{
-                                duration: 15,
-                                repeat: Infinity,
-                                ease: "linear"
-                            }}
-                            className="absolute -bottom-10 -left-10 w-16 h-16 border-2 border-accent-pink/30 rounded-full"
-                        ></motion.div>
-                    </div>
-                </FadeIn>
-
-                {/* Text Content - Shows SECOND on mobile, FIRST on desktop */}
-                <div className="space-y-6 order-2 md:order-1">
-                    <FadeIn direction="up" delay={0.2}>
-                        <p className="text-accent-cyan text-lg md:text-xl font-medium">
-                            Hi, I'm
-                        </p>
-                    </FadeIn>
-
-                    <FadeIn direction="up" delay={0.3}>
-                        <h1 className="text-4xl md:text-6xl lg:text-7xl font-display font-bold uppercase tracking-wider text-gradient leading-tight">
-                            AVISHEK GIRI
-                        </h1>
-                    </FadeIn>
-
-                    <FadeIn direction="up" delay={0.4}>
-                        <div className="h-16 md:h-20">
-                            <TypeAnimation
-                                sequence={[
-                                    'Full Stack Developer',
-                                    2000,
-                                    'MERN Stack Expert',
-                                    2000,
-                                    'AI Integration Specialist',
-                                    2000,
-                                    'Freelance Developer',
-                                    2000,
-                                ]}
-                                wrapper="span"
-                                speed={50}
-                                repeat={Infinity}
-                                className="text-2xl md:text-4xl font-bold text-white dark:text-white light:text-gray-900"
-                            />
-                        </div>
-                    </FadeIn>
-
-                    <FadeIn direction="up" delay={0.5}>
-                        <p className="text-text-secondary dark:text-text-secondary light:text-gray-600 text-base md:text-lg max-w-xl leading-relaxed">
-                            Crafting scalable web applications with modern technologies and AI-driven innovation.
-                            Specialized in building production-ready solutions that drive business growth.
-                        </p>
-                    </FadeIn>
-
-                    <FadeIn direction="up" delay={0.6}>
-                        <div className="flex flex-col sm:flex-row gap-4 pt-4">
-                            <Button
-                                variant="primary"
-                                size="lg"
-                                icon={Download}
-                                iconPosition="right"
-                                onClick={handleDownloadCV}
-                            >
-                                Download CV
-                            </Button>
-
-                            <Link to="contact" smooth={true} duration={500} offset={-80}>
+                        <FadeIn direction="up" delay={0.6}>
+                            <div className="flex flex-wrap gap-3 pt-2">
                                 <Button
-                                    variant="secondary"
+                                    variant="primary"
                                     size="lg"
-                                    icon={ArrowRight}
+                                    icon={Download}
                                     iconPosition="right"
+                                    onClick={handleDownloadCV}
                                 >
-                                    Contact Me
+                                    Download CV
                                 </Button>
-                            </Link>
-                        </div>
-                    </FadeIn>
+                                <Link to="contact" smooth={true} duration={500} offset={-80}>
+                                    <Button variant="secondary" size="lg" icon={ArrowRight} iconPosition="right">
+                                        Contact Me
+                                    </Button>
+                                </Link>
+                            </div>
+                        </FadeIn>
 
-                    <FadeIn direction="up" delay={0.7}>
-                        <div className="flex gap-5 pt-6">
-                            {socialLinks.map((social, index) => (
-                                <motion.a
-                                    key={index}
-                                    href={social.url}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    whileHover={{ scale: 1.2, y: -5 }}
-                                    className="w-12 h-12 rounded-xl bg-white/5 dark:bg-white/5 light:bg-black/5 border border-white/10 dark:border-white/10 light:border-black/10 flex items-center justify-center text-text-secondary hover:text-accent-cyan hover:border-accent-cyan/50 transition-all"
-                                    aria-label={social.label}
-                                >
-                                    <social.icon size={20} />
-                                </motion.a>
-                            ))}
+                        <FadeIn direction="up" delay={0.7}>
+                            <div className="flex gap-4 pt-2">
+                                {socialLinks.map((social, index) => (
+                                    <motion.a
+                                        key={index}
+                                        href={social.url}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        whileHover={{ scale: 1.2, y: -4 }}
+                                        className="w-11 h-11 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-text-secondary hover:text-accent-cyan hover:border-accent-purple/50 hover:bg-accent-purple/10 transition-all"
+                                        aria-label={social.label}
+                                    >
+                                        <social.icon size={18} />
+                                    </motion.a>
+                                ))}
+                            </div>
+                        </FadeIn>
+                    </div>
+
+                    {/* RIGHT — Profile Image */}
+                    <FadeIn direction="up" delay={0.3} className="order-1 md:order-2">
+                        <div className="relative flex justify-center items-center">
+                            <motion.div
+                                animate={{ y: [0, -16, 0] }}
+                                transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
+                                className="relative"
+                            >
+                                {/* Glow behind image */}
+                                <div className="absolute inset-0 bg-gradient-to-r from-accent-purple via-accent-cyan to-accent-violet rounded-3xl blur-xl opacity-40" />
+
+                                {/* Image */}
+                                <div className="relative w-64 h-64 sm:w-72 sm:h-72 md:w-80 md:h-80 lg:w-[360px] lg:h-[360px] rounded-3xl overflow-hidden border border-white/10 bg-[#0f0f0f]">
+                                    <img
+                                        src="/assets/images/profile.jpg"
+                                        alt="Avishek Giri - Full Stack Developer"
+                                        className="w-full h-full object-cover"
+                                        onError={(e) => {
+                                            e.target.style.display = 'none';
+                                            const fallback = e.target.nextElementSibling;
+                                            if (fallback) fallback.style.display = 'flex';
+                                        }}
+                                    />
+                                    <div className="w-full h-full hidden items-center justify-center text-6xl font-bold text-gradient absolute inset-0">
+                                        AG
+                                    </div>
+                                </div>
+                            </motion.div>
+
+                            {/* Decorative rings */}
+                            <motion.div
+                                animate={{ rotate: 360 }}
+                                transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+                                className="absolute -top-8 -right-8 w-20 h-20 border border-accent-purple/30 rounded-full hidden sm:block"
+                            />
+                            <motion.div
+                                animate={{ rotate: -360 }}
+                                transition={{ duration: 15, repeat: Infinity, ease: "linear" }}
+                                className="absolute -bottom-8 -left-8 w-14 h-14 border border-accent-cyan/30 rounded-full hidden sm:block"
+                            />
                         </div>
                     </FadeIn>
                 </div>
@@ -184,17 +161,11 @@ const Hero = () => {
             {/* Scroll Indicator */}
             <Link to="about" smooth={true} duration={500} offset={-80}>
                 <motion.div
-                    animate={{
-                        y: [0, 10, 0],
-                    }}
-                    transition={{
-                        duration: 2,
-                        repeat: Infinity,
-                        ease: "easeInOut"
-                    }}
-                    className="absolute bottom-10 left-1/2 -translate-x-1/2 cursor-pointer"
+                    animate={{ y: [0, 10, 0] }}
+                    transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+                    className="absolute bottom-8 left-1/2 -translate-x-1/2 cursor-pointer"
                 >
-                    <ChevronDown size={32} className="text-accent-cyan" />
+                    <ChevronDown size={30} className="text-accent-purple" />
                 </motion.div>
             </Link>
         </section>

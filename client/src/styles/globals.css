@@ -4,7 +4,7 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Base Styles */
+/* ====== BASE RESET ====== */
 * {
   margin: 0;
   padding: 0;
@@ -13,50 +13,55 @@
 
 html {
   scroll-behavior: smooth;
+  max-width: 100vw;
+  overflow-x: hidden;
 }
 
-/* Dark Mode (Default) */
+img {
+  max-width: 100%;
+}
+
+/* ====== DARK MODE (DEFAULT) ====== */
 body {
   font-family: 'Inter', sans-serif;
-  background-color: #0A0E27;
+  background-color: #000000;
   color: #FFFFFF;
   overflow-x: hidden;
   line-height: 1.6;
   transition: background-color 0.3s ease, color 0.3s ease;
 }
 
-/* Light Mode */
+/* ====== LIGHT MODE ====== */
 html.light body {
   background-color: #F5F7FA;
-  color: #1A1F3A;
+  color: #1A1A2E;
 }
 
-/* Smooth scrolling */
+/* ====== SMOOTH SCROLLING ====== */
 @media (prefers-reduced-motion: no-preference) {
   html {
     scroll-behavior: smooth;
   }
 }
 
-/* Selection - Dark Mode */
+/* ====== TEXT SELECTION ====== */
 ::selection {
-  background: #00F5FF;
-  color: #0A0E27;
-}
-
-/* Selection - Light Mode */
-html.light ::selection {
-  background: #0066FF;
+  background: #7C3AED;
   color: #FFFFFF;
 }
 
-/* Scrollbar - Dark Mode */
+html.light ::selection {
+  background: #7C3AED;
+  color: #FFFFFF;
+}
+
+/* ====== SCROLLBAR ====== */
 ::-webkit-scrollbar {
-  width: 10px;
+  width: 6px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #060913;
+  background: #000000;
 }
 
 html.light ::-webkit-scrollbar-track {
@@ -64,55 +69,62 @@ html.light ::-webkit-scrollbar-track {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #00F5FF;
-  border-radius: 5px;
+  background: linear-gradient(to bottom, #7C3AED, #00D4FF);
+  border-radius: 10px;
 }
 
 html.light ::-webkit-scrollbar-thumb {
-  background: #0066FF;
+  background: #7C3AED;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #0066FF;
+  background: linear-gradient(to bottom, #9D5CF5, #00D4FF);
 }
 
-html.light ::-webkit-scrollbar-thumb:hover {
-  background: #00F5FF;
-}
-
-/* Glassmorphism Utilities - Dark Mode */
+/* ====== GLASSMORPHISM ====== */
 .glass {
-  background: rgba(26, 31, 58, 0.7);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  transition: background 0.3s ease, border 0.3s ease;
+  background: rgba(255, 255, 255, 0.04);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow:
+    0 4px 24px rgba(0, 0, 0, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  transition: background 0.3s ease, border 0.3s ease, box-shadow 0.3s ease;
 }
 
-/* Glassmorphism - Light Mode */
+.glass:hover {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(124, 58, 237, 0.3);
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.5),
+    0 0 0 1px rgba(124, 58, 237, 0.15),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
 html.light .glass {
-  background: rgba(255, 255, 255, 0.8);
+  background: rgba(255, 255, 255, 0.7);
   border: 1px solid rgba(0, 0, 0, 0.08);
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.9);
 }
 
-/* Text Gradient */
+/* ====== TEXT GRADIENT ====== */
 .text-gradient {
-  background: linear-gradient(135deg, #00F5FF 0%, #0066FF 100%);
+  background: linear-gradient(135deg, #00D4FF 0%, #7C3AED 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
 
-/* Light Mode Text Colors */
+/* ====== LIGHT MODE OVERRIDES ====== */
 html.light .text-text-secondary {
   color: #6B7280 !important;
 }
 
 html.light .text-white {
-  color: #1A1F3A !important;
+  color: #1A1A2E !important;
 }
 
-/* Light Mode Backgrounds */
 html.light .bg-primary-dark {
   background-color: #F5F7FA !important;
 }
@@ -125,12 +137,10 @@ html.light .bg-primary-light {
   background-color: #FFFFFF !important;
 }
 
-/* Light Mode Borders */
 html.light [class*="border-white"] {
   border-color: rgba(0, 0, 0, 0.1) !important;
 }
 
-/* Light Mode Card Backgrounds */
 html.light .bg-white\/5 {
   background-color: rgba(0, 0, 0, 0.03) !important;
 }
@@ -139,12 +149,11 @@ html.light .bg-white\/10 {
   background-color: rgba(0, 0, 0, 0.05) !important;
 }
 
-/* Light Mode Hover States */
 html.light .hover\:bg-white\/10:hover {
   background-color: rgba(0, 0, 0, 0.08) !important;
 }
 
-/* RGB Text Animation */
+/* ====== RGB LOGO ANIMATION ====== */
 @keyframes rgb-flow {
   0% {
     background-position: 0% 50%;
@@ -173,14 +182,23 @@ html.light .hover\:bg-white\/10:hover {
   background-clip: text;
   color: transparent;
   animation: rgb-flow 5s ease infinite;
-  text-shadow: 0 0 20px rgba(255, 255, 255, 0.1);
   font-weight: 800;
   letter-spacing: -0.5px;
 }
 
-/* ====== MOBILE RESPONSIVENESS ====== */
+/* ====== SECTION DIVIDERS ====== */
+.section-divider {
+  width: 100%;
+  height: 1px;
+  background: linear-gradient(to right, transparent, rgba(124, 58, 237, 0.3), transparent);
+}
 
-/* Safe Area Insets for iOS devices with notch */
+/* ====== CARD HOVER GLOW ====== */
+.card-glow:hover {
+  box-shadow: 0 0 30px rgba(124, 58, 237, 0.15), 0 0 60px rgba(0, 212, 255, 0.05);
+}
+
+/* ====== MOBILE RESPONSIVENESS ====== */
 .pb-safe {
   padding-bottom: env(safe-area-inset-bottom);
 }
@@ -189,27 +207,23 @@ html.light .hover\:bg-white\/10:hover {
   padding-top: env(safe-area-inset-top);
 }
 
-/* Touch-friendly targets (min 44x44px for accessibility) */
 @media (max-width: 640px) {
   .touch-target {
     min-height: 44px;
     min-width: 44px;
   }
 
-  /* Larger tap areas on mobile */
   button,
   a {
     -webkit-tap-highlight-color: transparent;
   }
 
-  /* Prevent zoom on input focus (iOS) */
   input,
   textarea,
   select {
     font-size: 16px !important;
   }
 
-  /* Skill icons smaller on mobile */
   .skill-icon-container {
     width: 3.5rem !important;
     height: 3.5rem !important;
@@ -221,7 +235,7 @@ html.light .hover\:bg-white\/10:hover {
   }
 }
 
-/* Hide scrollbar on mobile chat */
+/* ====== HIDE SCROLLBAR ON MOBILE CHAT ====== */
 .hide-scrollbar {
   -ms-overflow-style: none;
   scrollbar-width: none;

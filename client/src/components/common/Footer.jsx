@@ -19,13 +19,12 @@ const Footer = () => {
     };
 
     return (
-        <footer className="bg-primary-darker relative overflow-hidden border-t border-white/10">
+        <footer className="bg-[#050505] relative overflow-hidden border-t border-white/[0.06]">
             {/* Background Effects */}
-            <div className="absolute inset-0 bg-gradient-to-b from-primary-dark/30 to-primary-darker" />
-            <div className="absolute top-0 left-1/3 w-96 h-96 bg-accent-cyan/3 rounded-full blur-3xl" />
-            <div className="absolute bottom-0 right-1/3 w-96 h-96 bg-accent-purple/3 rounded-full blur-3xl" />
+            <div className="absolute top-0 left-1/3 w-96 h-96 bg-accent-purple/5 rounded-full blur-3xl" />
+            <div className="absolute bottom-0 right-1/3 w-96 h-96 bg-accent-cyan/3 rounded-full blur-3xl" />
 
-            <div className="max-w-6xl mx-auto px-6 py-12 sm:py-16 relative z-10">
+            <div className="max-w-6xl mx-auto px-4 sm:px-6 py-12 sm:py-16 relative z-10">
 
                 {/* Main Content */}
                 <div className="flex flex-col items-center text-center space-y-8">
@@ -61,7 +60,7 @@ const Footer = () => {
                                 rel="noopener noreferrer"
                                 whileHover={{ scale: 1.1, y: -3 }}
                                 whileTap={{ scale: 0.95 }}
-                                className="w-12 h-12 sm:w-14 sm:h-14 rounded-xl bg-white/5 backdrop-blur-sm border border-white/10 flex items-center justify-center text-text-secondary hover:text-white hover:bg-gradient-to-br hover:from-accent-cyan/20 hover:to-accent-purple/20 hover:border-accent-cyan/50 transition-all duration-300"
+                                className="w-12 h-12 sm:w-14 sm:h-14 rounded-xl bg-white/5 border border-white/[0.08] flex items-center justify-center text-text-secondary hover:text-white hover:bg-accent-purple/10 hover:border-accent-purple/50 transition-all duration-300"
                                 aria-label={social.label}
                             >
                                 <social.icon size={20} className="sm:w-6 sm:h-6" />
@@ -124,7 +123,7 @@ const Footer = () => {
                             onClick={scrollToTop}
                             whileHover={{ scale: 1.05, y: -2 }}
                             whileTap={{ scale: 0.95 }}
-                            className="w-10 h-10 rounded-lg bg-gradient-to-br from-accent-cyan/20 to-accent-purple/20 border border-accent-cyan/30 flex items-center justify-center text-accent-cyan hover:border-accent-cyan/50 hover:shadow-lg hover:shadow-accent-cyan/20 transition-all group"
+                            className="w-10 h-10 rounded-lg bg-accent-purple/10 border border-accent-purple/30 flex items-center justify-center text-accent-purple hover:border-accent-purple/60 hover:bg-accent-purple/20 hover:shadow-lg hover:shadow-accent-purple/20 transition-all group"
                             aria-label="Scroll to top"
                         >
                             <ArrowUp size={18} className="group-hover:-translate-y-0.5 transition-transform" />

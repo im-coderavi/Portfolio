@@ -62,25 +62,25 @@ const Contact = () => {
     ];
 
     return (
-        <section id="contact" className="py-20 bg-primary-dark dark:bg-primary-dark light:bg-gray-50 transition-colors duration-300">
-            <div className="max-w-6xl mx-auto px-6">
+        <section id="contact" className="py-16 sm:py-20 bg-black">
+            <div className="max-w-6xl mx-auto px-4 sm:px-6">
                 {/* Section Heading */}
                 <FadeIn direction="up">
                     <div className="text-center mb-16">
-                        <h2 className="text-4xl md:text-5xl font-display font-bold text-gradient mb-4">
-                            Get In Touch
+                        <h2 className="text-3xl sm:text-4xl md:text-5xl font-display font-bold text-white mb-4">
+                            Get In <span className="text-gradient">Touch</span>
                         </h2>
-                        <div className="w-32 h-1 bg-gradient-to-r from-accent-cyan to-accent-blue mx-auto rounded-full mb-4"></div>
+                        <div className="w-24 h-1 bg-gradient-to-r from-accent-purple to-accent-cyan mx-auto rounded-full mb-4"></div>
                         <p className="text-text-secondary text-lg">
                             Have a project in mind? Let's work together!
                         </p>
                     </div>
                 </FadeIn>
 
-                <div className="grid md:grid-cols-[40%_60%] gap-8">
+                <div className="grid grid-cols-1 md:grid-cols-[40%_60%] gap-6 md:gap-8">
                     {/* Left Side - Contact Info */}
                     <FadeIn direction="right" delay={0.2}>
-                        <Card className="p-8 space-y-8">
+                        <Card className="p-5 sm:p-8 space-y-6 sm:space-y-8">
                             <div>
                                 <h3 className="text-2xl font-bold text-white mb-4">
                                     Let's Connect
@@ -94,7 +94,7 @@ const Contact = () => {
                             <div className="space-y-4">
                                 {contactInfo.map((info, index) => (
                                     <div key={index} className="flex items-center gap-4">
-                                        <div className="w-12 h-12 rounded-xl bg-accent-cyan/10 flex items-center justify-center flex-shrink-0">
+                                        <div className="w-12 h-12 rounded-xl bg-accent-purple/10 border border-accent-purple/20 flex items-center justify-center flex-shrink-0">
                                             <info.icon className="text-accent-cyan" size={20} />
                                         </div>
                                         <div>
@@ -122,7 +122,7 @@ const Contact = () => {
                                             target="_blank"
                                             rel="noopener noreferrer"
                                             whileHover={{ y: -5 }}
-                                            className="w-12 h-12 rounded-xl bg-accent-cyan/10 border border-accent-cyan/20 flex items-center justify-center text-accent-cyan hover:bg-accent-cyan hover:text-primary-dark transition-all"
+                                            className="w-12 h-12 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-text-secondary hover:text-accent-cyan hover:border-accent-purple/50 hover:bg-accent-purple/10 transition-all"
                                             aria-label={social.label}
                                         >
                                             <social.icon size={20} />
@@ -147,7 +147,7 @@ const Contact = () => {
 
                     {/* Right Side - Contact Form */}
                     <FadeIn direction="left" delay={0.2}>
-                        <Card className="p-8">
+                        <Card className="p-5 sm:p-8">
                             <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
                                 {/* Name */}
                                 <div>
@@ -155,7 +155,7 @@ const Contact = () => {
                                         {...register('name')}
                                         type="text"
                                         placeholder="Your Name *"
-                                        className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-text-muted focus:border-accent-cyan focus:outline-none transition-all"
+                                        className="w-full px-4 py-3 bg-white/[0.04] border border-white/[0.08] rounded-xl text-white placeholder-text-muted focus:border-accent-purple focus:outline-none transition-all"
                                     />
                                     {errors.name && (
                                         <p className="text-red-400 text-sm mt-1">{errors.name.message}</p>
@@ -168,7 +168,7 @@ const Contact = () => {
                                         {...register('email')}
                                         type="email"
                                         placeholder="Your Email *"
-                                        className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-text-muted focus:border-accent-cyan focus:outline-none transition-all"
+                                        className="w-full px-4 py-3 bg-white/[0.04] border border-white/[0.08] rounded-xl text-white placeholder-text-muted focus:border-accent-purple focus:outline-none transition-all"
                                     />
                                     {errors.email && (
                                         <p className="text-red-400 text-sm mt-1">{errors.email.message}</p>
@@ -181,7 +181,7 @@ const Contact = () => {
                                         {...register('subject')}
                                         type="text"
                                         placeholder="Subject"
-                                        className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-text-muted focus:border-accent-cyan focus:outline-none transition-all"
+                                        className="w-full px-4 py-3 bg-white/[0.04] border border-white/[0.08] rounded-xl text-white placeholder-text-muted focus:border-accent-purple focus:outline-none transition-all"
                                     />
                                 </div>
 
@@ -191,7 +191,7 @@ const Contact = () => {
                                         {...register('message')}
                                         rows="6"
                                         placeholder="Your Message *"
-                                        className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-text-muted focus:border-accent-cyan focus:outline-none transition-all resize-none"
+                                        className="w-full px-4 py-3 bg-white/[0.04] border border-white/[0.08] rounded-xl text-white placeholder-text-muted focus:border-accent-purple focus:outline-none transition-all resize-none"
                                     ></textarea>
                                     {errors.message && (
                                         <p className="text-red-400 text-sm mt-1">{errors.message.message}</p>
